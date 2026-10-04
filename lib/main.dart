@@ -164,7 +164,7 @@ class _KpiMainShellState extends State<KpiMainShell> {
         backgroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        titleSpacing: 20,
+        titleSpacing: 16,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
@@ -172,10 +172,10 @@ class _KpiMainShellState extends State<KpiMainShell> {
         title: Row(
           children: [
             Container(
-              width: 34,
-              height: 34,
+              width: 32,
+              height: 32,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(8),
                 gradient: const LinearGradient(
                   colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
                   begin: Alignment.topLeft,
@@ -184,144 +184,82 @@ class _KpiMainShellState extends State<KpiMainShell> {
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                    blurRadius: 8,
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
                 ],
               ),
-              child: const Icon(Icons.task_alt_rounded, color: Colors.white, size: 20),
+              child: const Icon(Icons.task_alt_rounded, color: Colors.white, size: 18),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    const Text(
-                      'Axion KPI & Vazifalar',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        color: Color(0xFF0F172A),
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFC7D2FE)),
-                      ),
-                      child: const Text(
-                        'ENTERPRISE',
-                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Biznes Ekotizim • ${isDirector ? "Boshqaruv" : "Xodim"} Rejimi',
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-                ),
-              ],
-            ),
-            const SizedBox(width: 16),
-            // User Role Tag (Clickable to switch to profile)
-            InkWell(
-              onTap: () => setState(() => _currentIndex = 2),
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isDirector ? const Color(0xFFEEF2FF) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isDirector ? const Color(0xFFC7D2FE) : const Color(0xFFCBD5E1),
+                const Text(
+                  'KPI & Vazifalar',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    color: Color(0xFF0F172A),
+                    letterSpacing: -0.3,
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                Row(
                   children: [
                     Container(
-                      width: 7,
-                      height: 7,
-                      decoration: BoxDecoration(
-                        color: isDirector ? const Color(0xFF4F46E5) : const Color(0xFF0EA5E9),
+                      width: 6,
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF10B981),
                         shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      currentUser.name,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: isDirector ? const Color(0xFF3730A3) : const Color(0xFF0F172A),
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '(${isDirector ? "Direktor" : "Xodim"})',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: isDirector ? const Color(0xFF6366F1) : const Color(0xFF64748B),
-                      ),
+                      ':8081 • ${isDirector ? "Direktor" : "Xodim"}',
+                      style: const TextStyle(fontSize: 10, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ],
         ),
         actions: [
           // Plagin: O'zbekcha AI Ekosistema Assistent
           if (widget.pluginManager.isPluginActive('plugin_uzbek_ai'))
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: InkWell(
-                onTap: () => _openAiAssistant(context),
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFAF5FF),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE9D5FF)),
+            IconButton(
+              icon: const Icon(Icons.auto_awesome, color: Color(0xFF9333EA), size: 20),
+              tooltip: "AI Buyruq",
+              visualDensity: VisualDensity.compact,
+              onPressed: () => _openAiAssistant(context),
+            ),
+          // User Avatar Button (Taps to switch to Profile Tab 2)
+          Padding(
+            padding: const EdgeInsets.only(right: 14, left: 4),
+            child: InkWell(
+              onTap: () => setState(() => _currentIndex = 2),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF3730A3), Color(0xFF4F46E5)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.auto_awesome, color: Color(0xFF9333EA), size: 16),
-                      SizedBox(width: 6),
-                      Text(
-                        'AI Buyruq',
-                        style: TextStyle(color: Color(0xFF7E22CE), fontWeight: FontWeight.bold, fontSize: 12),
-                      ),
-                    ],
+                  border: Border.all(color: const Color(0xFFC7D2FE), width: 1.5),
+                ),
+                child: Center(
+                  child: Text(
+                    currentUser.name[0],
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
-            ),
-          // Network Status Badge
-          Container(
-            margin: const EdgeInsets.only(right: 18),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0FDF4),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFBBF7D0)),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.wifi, size: 13, color: Color(0xFF16A34A)),
-                SizedBox(width: 5),
-                Text(':8081 Onlayn', style: TextStyle(color: Color(0xFF15803D), fontWeight: FontWeight.bold, fontSize: 11)),
-              ],
             ),
           ),
         ],
@@ -386,7 +324,7 @@ class _KpiMainShellState extends State<KpiMainShell> {
             const NavigationDestination(
               icon: Icon(Icons.person_outline),
               selectedIcon: Icon(Icons.person, color: Color(0xFF4F46E5)),
-              label: 'Profil & Sozlamalar',
+              label: 'Profil',
             ),
           ],
         ),
@@ -558,9 +496,9 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
         constraints: const BoxConstraints(maxWidth: 960),
         child: Column(
           children: [
-            // Top Command Header
+            // Top Command Header (Mobile First)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
@@ -580,7 +518,7 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
                           ),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText: 'Topshiriq yoki xodim nomini qidirish...',
+                              hintText: 'Topshiriq yoki xodimni qidirish...',
                               hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
                               prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF94A3B8)),
                               suffixIcon: _search.isNotEmpty
@@ -597,22 +535,22 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      // Create CTA button
-                      FilledButton.icon(
+                      const SizedBox(width: 8),
+                      // Compact mobile add button
+                      IconButton.filled(
                         onPressed: widget.onGoToCreate,
-                        icon: const Icon(Icons.add_rounded, size: 18),
-                        label: const Text('Yangi Vazifa', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                        style: FilledButton.styleFrom(
+                        icon: const Icon(Icons.add_rounded, size: 20),
+                        style: IconButton.styleFrom(
                           backgroundColor: const Color(0xFF4F46E5),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
+                          padding: const EdgeInsets.all(10),
                         ),
+                        tooltip: 'Yangi vazifa',
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   // Segmented Filter Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -676,7 +614,7 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       itemCount: tasks.length,
                       itemBuilder: (ctx, idx) {
                         return _buildTaskCard(tasks[idx]);
@@ -1019,81 +957,94 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
               }),
             ],
 
-            // Action Buttons (Workflow & RBAC)
-            const SizedBox(height: 14),
-            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+            // Action Buttons (Workflow & RBAC) - Mobile First Stacking
             const SizedBox(height: 12),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+            const SizedBox(height: 10),
 
+            // Metadata: Biriktirdi / Tasdiqlandi
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Timestamp / Created by or Approved by
-                if (status == 'done')
-                  Row(
-                    children: [
-                      const Icon(Icons.check_circle, size: 14, color: Color(0xFF16A34A)),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Tasdiqlandi: ${task.meta['approved_by'] ?? "Direktor"}',
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF15803D), fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  )
-                else
-                  Text(
-                    'Biriktirdi: ${task.meta['assigned_by'] ?? "Direktor"}',
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                if (status == 'done') ...[
+                  const Icon(Icons.check_circle, size: 14, color: Color(0xFF16A34A)),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Text(
+                      'Tasdiqlandi: ${task.meta['approved_by'] ?? "Direktor"}',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF15803D), fontWeight: FontWeight.w600),
+                    ),
                   ),
-
-                // Workflow action buttons
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (status == 'active')
-                      FilledButton.icon(
-                        onPressed: () => _submitTask(task),
-                        icon: const Icon(Icons.send_rounded, size: 14),
-                        label: const Text('Topshirish', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF4F46E5),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          elevation: 0,
-                        ),
-                      ),
-                    if (status == 'submitted') ...[
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          final tool = widget.service.schema.tools.firstWhere((t) => t.name == 'kpi_reject');
-                          await tool.handler({'id': task.id, 'reason': 'Qayta ishlansin'});
-                          if (mounted) setState(() {});
-                        },
-                        icon: const Icon(Icons.replay_rounded, size: 14, color: Color(0xFFD97706)),
-                        label: const Text('Qaytarish', style: TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.w600)),
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFFFDE68A)),
-                          backgroundColor: const Color(0xFFFFFBEB),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      FilledButton.icon(
-                        onPressed: () => _approveTask(task),
-                        icon: const Icon(Icons.check_circle_rounded, size: 14),
-                        label: const Text('Tasdiqlash & To\'lash', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF16A34A),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          elevation: 0,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                ] else ...[
+                  const Icon(Icons.person_pin_circle_outlined, size: 14, color: Color(0xFF94A3B8)),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: Text(
+                      'Biriktirdi: ${task.meta['assigned_by'] ?? "Direktor"}',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                    ),
+                  ),
+                ],
               ],
             ),
+
+            if (status == 'active') ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => _submitTask(task),
+                  icon: const Icon(Icons.send_rounded, size: 14),
+                  label: const Text('Topshirish (Tekshiruvga yuborish)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF4F46E5),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    elevation: 0,
+                  ),
+                ),
+              ),
+            ],
+
+            if (status == 'submitted') ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final tool = widget.service.schema.tools.firstWhere((t) => t.name == 'kpi_reject');
+                        await tool.handler({'id': task.id, 'reason': 'Qayta ishlansin'});
+                        if (mounted) setState(() {});
+                      },
+                      icon: const Icon(Icons.replay_rounded, size: 14, color: Color(0xFFD97706)),
+                      label: const Text('Qaytarish', style: TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.w600)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFFDE68A)),
+                        backgroundColor: const Color(0xFFFFFBEB),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    flex: 3,
+                    child: FilledButton.icon(
+                      onPressed: () => _approveTask(task),
+                      icon: const Icon(Icons.check_circle_rounded, size: 14),
+                      label: const Text('Tasdiqlash & Bonus', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFF16A34A),
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),
@@ -1188,7 +1139,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 840),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1196,7 +1147,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
               const Text(
                 'Yangi Vazifa Biriktirish',
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF0F172A),
                   letterSpacing: -0.4,
@@ -1205,11 +1156,11 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
               const SizedBox(height: 4),
               const Text(
                 'Xodimga yangi KPI topshirig\'ini yuklash, muddat va moliyaviy bonus belgilash',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // AI Smart Delegation Banner
+              // AI Smart Delegation Banner (Mobile First)
               if (isAiActive) ...[
                 Container(
                   decoration: BoxDecoration(
@@ -1222,78 +1173,74 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                        blurRadius: 16,
+                        blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                            ),
+                            child: const Icon(Icons.auto_awesome, color: Color(0xFFC7D2FE), size: 20),
                           ),
-                          child: const Icon(Icons.auto_awesome, color: Color(0xFFC7D2FE), size: 24),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    'O\'zbekcha AI Ekosistema Assistent',
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF10B981).withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(color: const Color(0xFF34D399).withValues(alpha: 0.4)),
-                                    ),
-                                    child: const Text('10% BONUS & LIMIT', style: TextStyle(color: Color(0xFF6EE7B7), fontSize: 9, fontWeight: FontWeight.bold)),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Tabiiy tilda topshiriq bering: AI muddat, xodim va xavfsiz 10% bonusni o\'zi hisoblaydi.',
-                                style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 12),
-                              ),
-                            ],
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Text(
+                              'O\'zbekcha AI Assistent',
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        FilledButton.icon(
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: const Color(0xFF34D399).withValues(alpha: 0.4)),
+                            ),
+                            child: const Text('10% LIMIT', style: TextStyle(color: Color(0xFF6EE7B7), fontSize: 9, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Tabiiy tilda topshiriq bering: AI muddat, xodim va 10% xavfsiz bonusni avtomat hisoblaydi.',
+                        style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 12, height: 1.4),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
                           onPressed: widget.onOpenAi,
                           icon: const Icon(Icons.flash_on_rounded, size: 16),
-                          label: const Text('AI Oyna', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          label: const Text('AI Buyruq Oynasini Ochish', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                           style: FilledButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: const Color(0xFF312E81),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
               ],
 
               // Quick Templates (Presets)
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
@@ -1306,24 +1253,24 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                       'Tezkor namunalar (1-klikda to\'ldirish):',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: 6,
+                      runSpacing: 6,
                       children: [
-                        _buildPresetChip('⚡ Oy yakuni hisoboti (Ali • 500k)', 'Oy yakuni hisoboti', 'Ali', '500000'),
-                        _buildPresetChip('🎯 Mijozlar bazasi auditi (Sardor • 300k)', 'Mijozlar bazasi auditi', 'Sardor', '300000'),
-                        _buildPresetChip('🚀 Dasturiy testlarni o\'tkazish (Vali • 700k)', 'Dasturiy testlarni o\'tkazish', 'Vali', '700000'),
+                        _buildPresetChip('⚡ Oy hisoboti (Ali • 500k)', 'Oy yakuni hisoboti', 'Ali', '500000'),
+                        _buildPresetChip('🎯 Baza auditi (Sardor • 300k)', 'Mijozlar bazasi auditi', 'Sardor', '300000'),
+                        _buildPresetChip('🚀 IT testlar (Vali • 700k)', 'Dasturiy testlarni o\'tkazish', 'Vali', '700000'),
                       ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
-              // Main Form Card
+              // Main Form Card (Mobile First)
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -1331,7 +1278,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 12,
+                      blurRadius: 10,
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -1365,14 +1312,18 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-                    // Field 2: Biriktirilgan xodim (Selectable User Cards)
+                    // Field 2: Biriktirilgan xodim (2x2 Mobile Grid)
                     const Text('Ijrochi Xodim *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                    GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 2.5,
                       children: _employees.map((emp) {
                         final isSel = _selectedEmployee == emp['name'];
                         return InkWell(
@@ -1380,7 +1331,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                           borderRadius: BorderRadius.circular(12),
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 150),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                             decoration: BoxDecoration(
                               color: isSel ? const Color(0xFFEEF2FF) : const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(12),
@@ -1390,11 +1341,10 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                               ),
                             ),
                             child: Row(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Container(
-                                  width: 24,
-                                  height: 24,
+                                  width: 28,
+                                  height: 28,
                                   decoration: BoxDecoration(
                                     color: isSel ? const Color(0xFF4F46E5) : const Color(0xFF94A3B8),
                                     shape: BoxShape.circle,
@@ -1402,121 +1352,113 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                                   child: Center(
                                     child: Text(
                                       emp['name']![0],
-                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      emp['name']!,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: isSel ? FontWeight.bold : FontWeight.w600,
-                                        color: isSel ? const Color(0xFF312E81) : const Color(0xFF334155),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        emp['name']!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isSel ? FontWeight.bold : FontWeight.w600,
+                                          color: isSel ? const Color(0xFF312E81) : const Color(0xFF334155),
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '${emp['role']} • ${emp['dept']}',
-                                      style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
-                                    ),
-                                  ],
+                                      Text(
+                                        emp['dept']!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                                if (isSel) ...[
-                                  const SizedBox(width: 8),
+                                if (isSel)
                                   const Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF4F46E5)),
-                                ],
                               ],
                             ),
                           ),
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-                    // Field 3 & 4: Deadline & Priority in 2 Columns
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Deadline
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Tugash Muddati *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: ['Bugun', 'Ertaga', '3 kunda', '1 haftada', '1 oyda'].map((d) {
-                                  final isSel = _selectedDeadline == d;
-                                  return ChoiceChip(
-                                    label: Text(d),
-                                    selected: isSel,
-                                    selectedColor: const Color(0xFFEEF2FF),
-                                    backgroundColor: const Color(0xFFF8FAFC),
-                                    labelStyle: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
-                                      color: isSel ? const Color(0xFF4338CA) : const Color(0xFF475569),
-                                    ),
-                                    side: BorderSide(
-                                      color: isSel ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
-                                    ),
-                                    onSelected: (val) {
-                                      if (val) setState(() => _selectedDeadline = d);
-                                    },
-                                  );
-                                }).toList(),
+                    // Field 3: Tugash Muddati (Mobile Scrollable Chips)
+                    const Text('Tugash Muddati *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    const SizedBox(height: 8),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: ['Bugun', 'Ertaga', '3 kunda', '1 haftada', '1 oyda'].map((d) {
+                          final isSel = _selectedDeadline == d;
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: ChoiceChip(
+                              label: Text(d),
+                              selected: isSel,
+                              selectedColor: const Color(0xFFEEF2FF),
+                              backgroundColor: const Color(0xFFF8FAFC),
+                              labelStyle: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                                color: isSel ? const Color(0xFF4338CA) : const Color(0xFF475569),
                               ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Priority
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Ustuvorlik *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 6,
-                                runSpacing: 6,
-                                children: [
-                                  {'id': 'normal', 'label': 'Oddiy'},
-                                  {'id': 'high', 'label': '⚡ Muhim'},
-                                  {'id': 'urgent', 'label': '🚨 Shoshilinch'},
-                                ].map((p) {
-                                  final isSel = _selectedPriority == p['id'];
-                                  return ChoiceChip(
-                                    label: Text(p['label']!),
-                                    selected: isSel,
-                                    selectedColor: const Color(0xFFEEF2FF),
-                                    backgroundColor: const Color(0xFFF8FAFC),
-                                    labelStyle: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
-                                      color: isSel ? const Color(0xFF4338CA) : const Color(0xFF475569),
-                                    ),
-                                    side: BorderSide(
-                                      color: isSel ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
-                                    ),
-                                    onSelected: (val) {
-                                      if (val) setState(() => _selectedPriority = p['id']!);
-                                    },
-                                  );
-                                }).toList(),
+                              side: BorderSide(
+                                color: isSel ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
+                              onSelected: (val) {
+                                if (val) setState(() => _selectedDeadline = d);
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
+
+                    // Field 4: Ustuvorlik (Mobile 3-column Expanded Row)
+                    const Text('Ustuvorlik *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        {'id': 'normal', 'label': 'Oddiy'},
+                        {'id': 'high', 'label': '⚡ Muhim'},
+                        {'id': 'urgent', 'label': '🚨 Shoshilinch'},
+                      ].map((p) {
+                        final isSel = _selectedPriority == p['id'];
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                            child: ChoiceChip(
+                              label: Center(child: Text(p['label']!)),
+                              selected: isSel,
+                              selectedColor: const Color(0xFFEEF2FF),
+                              backgroundColor: const Color(0xFFF8FAFC),
+                              labelStyle: TextStyle(
+                                fontSize: 11,
+                                fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                                color: isSel ? const Color(0xFF4338CA) : const Color(0xFF475569),
+                              ),
+                              side: BorderSide(
+                                color: isSel ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
+                              ),
+                              onSelected: (val) {
+                                if (val) setState(() => _selectedPriority = p['id']!);
+                              },
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
 
                     // Field 5: Bonus Summasi
                     const Text('Bonus Summasi (UZS)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
@@ -1566,7 +1508,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
                     // Field 6: Nazorat punktlari (Bosqichlar / Checkpoints)
                     const Text('Nazorat punktlari (Rejadagi qadamlar):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
@@ -1578,7 +1520,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                             controller: _checkpointController,
                             style: const TextStyle(fontSize: 13),
                             decoration: InputDecoration(
-                              hintText: 'Masalan: 1-bosqich: Loyihani tahlil qilish',
+                              hintText: 'Masalan: 1-bosqich reja',
                               hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
                               filled: true,
                               fillColor: const Color(0xFFF8FAFC),
@@ -1614,18 +1556,18 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                           label: const Text('Qo\'shish'),
                           style: FilledButton.styleFrom(
                             backgroundColor: const Color(0xFF334155),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                         ),
                       ],
                     ),
                     if (_checkpoints.isNotEmpty) ...[
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 10),
                       ..._checkpoints.asMap().entries.map((e) {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(8),
@@ -1644,9 +1586,9 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                                   child: Text('${e.key + 1}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
                                 ),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 8),
                               Expanded(
-                                child: Text(e.value, style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B))),
+                                child: Text(e.value, style: const TextStyle(fontSize: 12, color: Color(0xFF1E293B))),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.close, size: 16, color: Color(0xFF94A3B8)),
@@ -1658,7 +1600,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                         );
                       }),
                     ],
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
 
                     // Primary Submit Button
                     SizedBox(
@@ -1668,7 +1610,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
                         onPressed: _saveTask,
                         icon: const Icon(Icons.add_task_rounded, size: 18),
                         label: const Text(
-                          'Vazifani Biriktirish & Ishga Tushirish',
+                          'Vazifani Biriktirish & Boshlash',
                           style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                         style: FilledButton.styleFrom(
@@ -1751,12 +1693,12 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 960),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // --------------------------------------------------------------
-              // 1. HERO EXECUTIVE PROFILE CARD (PREMIUM WORKSPACE IDENTITY)
+              // 1. HERO EXECUTIVE PROFILE CARD (PREMIUM MOBILE IDENTITY)
               // --------------------------------------------------------------
               Container(
                 decoration: BoxDecoration(
@@ -1766,8 +1708,8 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -1775,7 +1717,7 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                   children: [
                     // Top Accent Banner Strip
                     Container(
-                      height: 6,
+                      height: 5,
                       decoration: const BoxDecoration(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                         gradient: LinearGradient(
@@ -1784,18 +1726,17 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
                           Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Avatar with Status Ring
                               Stack(
                                 children: [
                                   Container(
-                                    width: 72,
-                                    height: 72,
+                                    width: 56,
+                                    height: 56,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       gradient: const LinearGradient(
@@ -1806,8 +1747,8 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
                                         ),
                                       ],
                                     ),
@@ -1816,7 +1757,7 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                                         _profile.name[0],
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 28,
+                                          fontSize: 22,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -1826,18 +1767,18 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                                     bottom: 0,
                                     right: 0,
                                     child: Container(
-                                      width: 18,
-                                      height: 18,
+                                      width: 14,
+                                      height: 14,
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF10B981),
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 3),
+                                        border: Border.all(color: Colors.white, width: 2),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(width: 20),
+                              const SizedBox(width: 14),
                               // Name, Role & Details
                               Expanded(
                                 child: Column(
@@ -1845,76 +1786,81 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
-                                          _profile.name,
-                                          style: const TextStyle(
-                                            fontSize: 22,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF0F172A),
-                                            letterSpacing: -0.5,
+                                        Flexible(
+                                          child: Text(
+                                            _profile.name,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF0F172A),
+                                              letterSpacing: -0.4,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
-                                        const Icon(Icons.verified, color: Color(0xFF4F46E5), size: 18),
-                                        const Spacer(),
-                                        // Enterprise Badge
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFEEF2FF),
-                                            borderRadius: BorderRadius.circular(20),
-                                            border: Border.all(color: const Color(0xFFC7D2FE)),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                width: 6,
-                                                height: 6,
-                                                decoration: const BoxDecoration(
-                                                  color: Color(0xFF4F46E5),
-                                                  shape: BoxShape.circle,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                _profile.role.name.toUpperCase(),
-                                                style: const TextStyle(
-                                                  color: Color(0xFF3730A3),
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.bold,
-                                                  letterSpacing: 0.5,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                        const SizedBox(width: 6),
+                                        const Icon(Icons.verified, color: Color(0xFF4F46E5), size: 16),
                                       ],
                                     ),
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: 3),
                                     Text(
-                                      '${_profile.department} Departamenti • Axion Software Inc.',
+                                      '${_profile.department} • Axion Software',
                                       style: const TextStyle(
-                                        fontSize: 13,
-                                        color: Color(0xFF475569),
+                                        fontSize: 12,
+                                        color: Color(0xFF64748B),
                                         fontWeight: FontWeight.w500,
                                       ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    const SizedBox(height: 12),
-                                    // Contact Meta Strip
-                                    Wrap(
-                                      spacing: 16,
-                                      runSpacing: 8,
-                                      children: [
-                                        _buildMetaItem(Icons.email_outlined, _profile.email),
-                                        _buildMetaItem(Icons.phone_outlined, _profile.phone),
-                                        _buildMetaItem(Icons.badge_outlined, 'ID: #${_profile.id.toUpperCase()}'),
-                                        _buildMetaItem(Icons.security, '2FA Himoyalangan'),
-                                      ],
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEEF2FF),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: const Color(0xFFC7D2FE)),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            width: 6,
+                                            height: 6,
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFF4F46E5),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            _profile.role.name.toUpperCase(),
+                                            style: const TextStyle(
+                                              color: Color(0xFF3730A3),
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                          const SizedBox(height: 10),
+                          // Contact Meta Strip
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 6,
+                            children: [
+                              _buildMetaItem(Icons.email_outlined, _profile.email),
+                              _buildMetaItem(Icons.phone_outlined, _profile.phone),
+                              _buildMetaItem(Icons.badge_outlined, 'ID: #${_profile.id.toUpperCase()}'),
+                              _buildMetaItem(Icons.security, '2FA Himoyalangan'),
                             ],
                           ),
                         ],
@@ -1923,42 +1869,50 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // --------------------------------------------------------------
-              // 2. EXECUTIVE METRICS STRIP (4 STATS CARDS)
+              // 2. EXECUTIVE METRICS GRID (2x2 MOBILE FIRST)
               // --------------------------------------------------------------
-              Row(
+              Column(
                 children: [
-                  Expanded(child: _buildMetricTile('Vazifalar Soni', '18 ta', '14 ta bajarilgan', const Color(0xFF4F46E5), Icons.task_alt)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildMetricTile('KPI Reytingi', '98.4%', 'A\'lo daraja', const Color(0xFF10B981), Icons.trending_up)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildMetricTile('Bonus Fondi', '2.5M UZS', 'Moliyadan tasdiqlangan', const Color(0xFF0284C7), Icons.monetization_on_outlined)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildMetricTile('Vakolat Darajasi', isDirector ? 'Tier 1' : 'Tier 3', isDirector ? 'To\'liq nazorat' : 'Standart xodim', const Color(0xFF7C3AED), Icons.shield_outlined)),
+                  Row(
+                    children: [
+                      Expanded(child: _buildMetricTile('Vazifalar', '18 ta', '14 ta bajarilgan', const Color(0xFF4F46E5), Icons.task_alt)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _buildMetricTile('KPI Reyting', '98.4%', '+3.2% a\'lo daraja', const Color(0xFF10B981), Icons.trending_up)),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(child: _buildMetricTile('Bonus Fondi', '2.5M UZS', 'Tasdiqlangan kassa', const Color(0xFF0284C7), Icons.monetization_on_outlined)),
+                      const SizedBox(width: 10),
+                      Expanded(child: _buildMetricTile('Vakolat', isDirector ? 'Tier 1' : 'Tier 3', isDirector ? 'To\'liq nazorat' : 'Standart xodim', const Color(0xFF7C3AED), Icons.shield_outlined)),
+                    ],
+                  ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
               // --------------------------------------------------------------
-              // 3. SEGMENTED TABS CONTROLLER (LINEAR / STRIPE STYLE)
+              // 3. SEGMENTED TABS CONTROLLER (COMPACT MOBILE PILLS)
               // --------------------------------------------------------------
               Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE2E8F0).withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    _buildSegmentButton(0, Icons.manage_accounts_outlined, 'Foydalanuvchi & RBAC Rollar'),
-                    _buildSegmentButton(1, Icons.extension_outlined, 'Plaginlar Markazi (${plugins.length})'),
-                    _buildSegmentButton(2, Icons.dns_outlined, 'Infratuzilma & Xavfsizlik'),
+                    _buildSegmentButton(0, Icons.manage_accounts_outlined, 'Rollar'),
+                    _buildSegmentButton(1, Icons.extension_outlined, 'Plaginlar (${plugins.length})'),
+                    _buildSegmentButton(2, Icons.dns_outlined, 'Tizim'),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // --------------------------------------------------------------
               // 4. SEGMENT CONTENT VIEWS
@@ -1967,7 +1921,7 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
               if (_selectedSegment == 1) _buildPluginsSection(plugins),
               if (_selectedSegment == 2) _buildInfrastructureSection(),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -1983,7 +1937,7 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
         onTap: () => setState(() => _selectedSegment = index),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(vertical: 9),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
             color: isSelected ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
@@ -2002,14 +1956,14 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
             children: [
               Icon(
                 icon,
-                size: 16,
+                size: 15,
                 color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
                 ),
@@ -2021,21 +1975,21 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
     );
   }
 
-  // 1-BO'LIM: RBAC ROLLARI VA FOYDALANUVCHILAR
+  // 1-BO'LIM: RBAC ROLLARI VA FOYDALANUVCHILAR (MOBILE FIRST CARD)
   Widget _buildRbacSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Foydalanuvchi va Rolni Tanlash (RBAC)',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
         ),
         const SizedBox(height: 4),
         const Text(
           'Tizim sinovi uchun istalgan akkauntga o\'tishingiz mumkin. Ruxsatlar darhol moslashadi.',
           style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         ...UserProfile.defaultProfiles.map((p) {
           final isCurrent = p.id == _profile.id;
           final isDir = p.role == UserRole.director;
@@ -2060,55 +2014,103 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                     ]
                   : null,
             ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              leading: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: isCurrent ? const Color(0xFF4F46E5) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  isDir ? Icons.shield : (isMgr ? Icons.business_center : Icons.person),
-                  color: isCurrent ? Colors.white : const Color(0xFF64748B),
-                  size: 20,
-                ),
-              ),
-              title: Row(
-                children: [
-                  Text(
-                    p.name,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
-                      color: const Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isDir
-                          ? const Color(0xFFFEF3C7)
-                          : (isCurrent ? Colors.white : const Color(0xFFF1F5F9)),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      p.role.name.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: isDir ? const Color(0xFF92400E) : const Color(0xFF475569),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: isCurrent ? const Color(0xFF4F46E5) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        isDir ? Icons.shield : (isMgr ? Icons.business_center : Icons.person),
+                        color: isCurrent ? Colors.white : const Color(0xFF64748B),
+                        size: 18,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Wrap(
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                p.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
+                                  color: const Color(0xFF0F172A),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                decoration: BoxDecoration(
+                                  color: isDir
+                                      ? const Color(0xFFFEF3C7)
+                                      : (isCurrent ? Colors.white : const Color(0xFFF1F5F9)),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  p.role.name.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDir ? const Color(0xFF92400E) : const Color(0xFF475569),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            '${p.department} • Axion ID: #${p.id}',
+                            style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (isCurrent)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4F46E5),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.check, size: 12, color: Colors.white),
+                            SizedBox(width: 4),
+                            Text('Faol', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      )
+                    else
+                      OutlinedButton(
+                        onPressed: () {
+                          widget.onProfileChanged(p);
+                          setState(() {});
+                        },
+                        style: OutlinedButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          side: const BorderSide(color: Color(0xFFCBD5E1)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('O\'tish', style: TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w600)),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Wrap(
                   spacing: 6,
+                  runSpacing: 4,
                   children: [
                     _buildPermissionTag(
                       isDir ? 'To\'liq Tasdiq' : (isMgr ? 'Menejer Tasdig\'i' : 'Vazifa Topshirish'),
@@ -2124,32 +2126,7 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
                     ),
                   ],
                 ),
-              ),
-              trailing: isCurrent
-                  ? Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF4F46E5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.check, size: 14, color: Colors.white),
-                    )
-                  : OutlinedButton(
-                      onPressed: () {
-                        widget.onProfileChanged(p);
-                        setState(() {});
-                      },
-                      style: OutlinedButton.styleFrom(
-                        visualDensity: VisualDensity.compact,
-                        side: const BorderSide(color: Color(0xFFCBD5E1)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                      ),
-                      child: const Text('O\'tish', style: TextStyle(fontSize: 12, color: Color(0xFF475569))),
-                    ),
-              onTap: () {
-                widget.onProfileChanged(p);
-                setState(() {});
-              },
+              ],
             ),
           );
         }),
