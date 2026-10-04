@@ -155,54 +155,124 @@ class _KpiMainShellState extends State<KpiMainShell> {
   @override
   Widget build(BuildContext context) {
     final activeCount = widget.service.store.all.where((e) => e.status == 'active').length;
+    final currentUser = _security.currentUser;
+    final isDirector = currentUser.role == UserRole.director;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        titleSpacing: 20,
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Divider(height: 1, thickness: 1, color: Color(0xFFE2E8F0)),
+        ),
         title: Row(
           children: [
-            const Icon(Icons.check_circle_outline, color: Colors.indigo, size: 24),
-            const SizedBox(width: 8),
-            const Text(
-              'KPI & Vazifalar',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(width: 12),
-            // Faol profil nishoni
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(
-                color: _security.currentUser.role == UserRole.director
-                    ? Colors.indigo.shade50
-                    : Colors.blue.shade50,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: _security.currentUser.role == UserRole.director
-                      ? Colors.indigo.shade300
-                      : Colors.blue.shade300,
+                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    _security.currentUser.role == UserRole.director ? Icons.shield : Icons.person,
-                    size: 13,
-                    color: _security.currentUser.role == UserRole.director
-                        ? Colors.indigo.shade800
-                        : Colors.blue.shade800,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    widget.profileManager.current.name,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: _security.currentUser.role == UserRole.director
-                          ? Colors.indigo.shade900
-                          : Colors.blue.shade900,
-                    ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
                 ],
+              ),
+              child: const Icon(Icons.task_alt_rounded, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      'Axion KPI & Vazifalar',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEEF2FF),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFC7D2FE)),
+                      ),
+                      child: const Text(
+                        'ENTERPRISE',
+                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF4338CA)),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  'Biznes Ekotizim • ${isDirector ? "Boshqaruv" : "Xodim"} Rejimi',
+                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            // User Role Tag (Clickable to switch to profile)
+            InkWell(
+              onTap: () => setState(() => _currentIndex = 2),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isDirector ? const Color(0xFFEEF2FF) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDirector ? const Color(0xFFC7D2FE) : const Color(0xFFCBD5E1),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 7,
+                      height: 7,
+                      decoration: BoxDecoration(
+                        color: isDirector ? const Color(0xFF4F46E5) : const Color(0xFF0EA5E9),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      currentUser.name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isDirector ? const Color(0xFF3730A3) : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${isDirector ? "Direktor" : "Xodim"})',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: isDirector ? const Color(0xFF6366F1) : const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -210,25 +280,47 @@ class _KpiMainShellState extends State<KpiMainShell> {
         actions: [
           // Plagin: O'zbekcha AI Ekosistema Assistent
           if (widget.pluginManager.isPluginActive('plugin_uzbek_ai'))
-            IconButton(
-              icon: const Icon(Icons.auto_awesome, color: Colors.purple),
-              tooltip: "O'zbekcha AI Assistent",
-              onPressed: () => _openAiAssistant(context),
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: InkWell(
+                onTap: () => _openAiAssistant(context),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFAF5FF),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE9D5FF)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.auto_awesome, color: Color(0xFF9333EA), size: 16),
+                      SizedBox(width: 6),
+                      Text(
+                        'AI Buyruq',
+                        style: TextStyle(color: Color(0xFF7E22CE), fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
+          // Network Status Badge
           Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: const EdgeInsets.only(right: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.green.withValues(alpha: 0.1),
+              color: const Color(0xFFF0FDF4),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.green.shade400),
+              border: Border.all(color: const Color(0xFFBBF7D0)),
             ),
             child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.wifi, size: 13, color: Colors.green),
+                Icon(Icons.wifi, size: 13, color: Color(0xFF16A34A)),
                 SizedBox(width: 5),
-                Text(':8081', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text(':8081 Onlayn', style: TextStyle(color: Color(0xFF15803D), fontWeight: FontWeight.bold, fontSize: 11)),
               ],
             ),
           ),
@@ -259,28 +351,45 @@ class _KpiMainShellState extends State<KpiMainShell> {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-        destinations: [
-          NavigationDestination(
-            icon: Badge(
-              isLabelVisible: activeCount > 0,
-              label: Text('$activeCount'),
-              child: const Icon(Icons.task_alt),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
+        ),
+        child: NavigationBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          indicatorColor: const Color(0xFFEEF2FF),
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
+          destinations: [
+            NavigationDestination(
+              icon: Badge(
+                isLabelVisible: activeCount > 0,
+                backgroundColor: const Color(0xFF4F46E5),
+                label: Text('$activeCount', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                child: const Icon(Icons.task_alt_outlined),
+              ),
+              selectedIcon: Badge(
+                isLabelVisible: activeCount > 0,
+                backgroundColor: const Color(0xFF4F46E5),
+                label: Text('$activeCount', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                child: const Icon(Icons.task_alt, color: Color(0xFF4F46E5)),
+              ),
+              label: 'Vazifalar',
             ),
-            label: 'Vazifalar',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.add_task),
-            label: 'Vazifa Qo\'shish',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profil & Sozlamalar',
-          ),
-        ],
+            const NavigationDestination(
+              icon: Icon(Icons.add_task_outlined),
+              selectedIcon: Icon(Icons.add_task, color: Color(0xFF4F46E5)),
+              label: 'Vazifa Qo\'shish',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person, color: Color(0xFF4F46E5)),
+              label: 'Profil & Sozlamalar',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -306,7 +415,7 @@ class KpiTasksTab extends StatefulWidget {
 }
 
 class _KpiTasksTabState extends State<KpiTasksTab> {
-  String _filter = 'all'; // all, active, submitted, done, overdue
+  String _filter = 'all'; // all, active, submitted, done
   String _search = '';
 
   List<Entity> get _tasks {
@@ -404,8 +513,36 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
       );
       return;
     }
-    widget.service.store.delete(task.id);
-    if (mounted) setState(() {});
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Vazifani o\'chirish', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        content: Text('Haqiqatdan ham "${task.name}" vazifasini butunlay o\'chirmoqchimisiz?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Bekor qilish'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFDC2626)),
+            child: const Text('O\'chirish'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      widget.service.store.delete(task.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('"${task.name}" o\'chirildi.')),
+        );
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -416,199 +553,429 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
     final submittedCount = all.where((e) => e.status == 'submitted').length;
     final doneCount = all.where((e) => e.status == 'done').length;
 
-    return Column(
-      children: [
-        // Qidirish va Filtrlar
-        Container(
-          color: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  hintText: 'Vazifa yoki xodim nomini qidirish...',
-                  hintStyle: const TextStyle(fontSize: 13),
-                  isDense: true,
-                  filled: true,
-                  fillColor: const Color(0xFFF1F3F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                onChanged: (v) => setState(() => _search = v),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 960),
+        child: Column(
+          children: [
+            // Top Command Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
               ),
-              const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    FilterChip(
-                      selected: _filter == 'all',
-                      label: Text('Barchasi (${all.length})'),
-                      onSelected: (_) => setState(() => _filter = 'all'),
-                    ),
-                    const SizedBox(width: 6),
-                    FilterChip(
-                      selected: _filter == 'active',
-                      label: Text('Bajarilmoqda ($activeCount)'),
-                      selectedColor: Colors.amber.shade100,
-                      onSelected: (_) => setState(() => _filter = 'active'),
-                    ),
-                    const SizedBox(width: 6),
-                    FilterChip(
-                      selected: _filter == 'submitted',
-                      label: Text('Tekshiruvda ($submittedCount)'),
-                      selectedColor: Colors.purple.shade100,
-                      onSelected: (_) => setState(() => _filter = 'submitted'),
-                    ),
-                    const SizedBox(width: 6),
-                    FilterChip(
-                      selected: _filter == 'done',
-                      label: Text('Bajarildi ($doneCount)'),
-                      selectedColor: Colors.green.shade100,
-                      onSelected: (_) => setState(() => _filter = 'done'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(height: 1),
-
-        // Vazifalar ro'yxati
-        Expanded(
-          child: tasks.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      Icon(Icons.assignment_outlined, size: 48, color: Colors.grey.shade400),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Hech qanday vazifa topilmadi',
-                        style: TextStyle(fontSize: 15, color: Colors.grey, fontWeight: FontWeight.bold),
+                      // Search box
+                      Expanded(
+                        child: Container(
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Topshiriq yoki xodim nomini qidirish...',
+                              hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                              prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF94A3B8)),
+                              suffixIcon: _search.isNotEmpty
+                                  ? IconButton(
+                                      icon: const Icon(Icons.clear, size: 16, color: Color(0xFF94A3B8)),
+                                      onPressed: () => setState(() => _search = ''),
+                                    )
+                                  : null,
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                            style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
+                            onChanged: (v) => setState(() => _search = v),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      ElevatedButton.icon(
+                      const SizedBox(width: 12),
+                      // Create CTA button
+                      FilledButton.icon(
                         onPressed: widget.onGoToCreate,
-                        icon: const Icon(Icons.add),
-                        label: const Text('Yangi vazifa yaratish'),
+                        icon: const Icon(Icons.add_rounded, size: 18),
+                        label: const Text('Yangi Vazifa', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF4F46E5),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
                       ),
                     ],
                   ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  itemCount: tasks.length,
-                  itemBuilder: (ctx, idx) {
-                    final task = tasks[idx];
-                    return _buildTaskCard(task);
-                  },
-                ),
+                  const SizedBox(height: 12),
+                  // Segmented Filter Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        _buildFilterPill('all', 'Barchasi', all.length, const Color(0xFF4F46E5)),
+                        const SizedBox(width: 8),
+                        _buildFilterPill('active', '● Jarayonda', activeCount, const Color(0xFF3B82F6)),
+                        const SizedBox(width: 8),
+                        _buildFilterPill('submitted', '⏳ Tekshiruvda', submittedCount, const Color(0xFF9333EA)),
+                        const SizedBox(width: 8),
+                        _buildFilterPill('done', '✓ Bajarildi', doneCount, const Color(0xFF16A34A)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Tasks List Area
+            Expanded(
+              child: tasks.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 64,
+                              height: 64,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEEF2FF),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Icon(Icons.assignment_outlined, size: 32, color: Color(0xFF6366F1)),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Hech qanday vazifa topilmadi',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                            ),
+                            const SizedBox(height: 6),
+                            const Text(
+                              'Qidiruv parametrlarini o\'zgartiring yoki yangi vazifa biriktiring.',
+                              style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            FilledButton.icon(
+                              onPressed: widget.onGoToCreate,
+                              icon: const Icon(Icons.add_rounded, size: 16),
+                              label: const Text('Birinchi vazifani yaratish'),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF4F46E5),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      itemCount: tasks.length,
+                      itemBuilder: (ctx, idx) {
+                        return _buildTaskCard(tasks[idx]);
+                      },
+                    ),
+            ),
+          ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildFilterPill(String id, String label, int count, Color activeColor) {
+    final isSel = _filter == id;
+    return InkWell(
+      onTap: () => setState(() => _filter = id),
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSel ? activeColor.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSel ? activeColor.withValues(alpha: 0.5) : const Color(0xFFE2E8F0),
+            width: isSel ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSel ? FontWeight.bold : FontWeight.w500,
+                color: isSel ? activeColor : const Color(0xFF475569),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+              decoration: BoxDecoration(
+                color: isSel ? activeColor : const Color(0xFFCBD5E1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildTaskCard(Entity task) {
     final status = task.status;
-    final assignedTo = task.meta['assigned_to'] ?? 'Biriktirilmagan';
-    final deadline = task.meta['deadline'] ?? 'Muddatsiz';
+    final assignedTo = (task.meta['assigned_to'] ?? 'Biriktirilmagan').toString();
+    final deadline = (task.meta['deadline'] ?? 'Muddatsiz').toString();
+    final priority = (task.meta['priority'] ?? 'normal').toString();
     final bonus = UzbekNlp.parseNumber(task.meta['bonus_amount']);
     final checkpoints = (task.meta['checkpoints'] as List<dynamic>?) ?? [];
     final user = widget.security.currentUser;
 
-    Color statusColor;
-    String statusText;
+    // Status colors and labels
+    Color statusBg;
+    Color statusText;
+    Color statusBorder;
+    String statusLabel;
+
     if (status == 'done') {
-      statusColor = Colors.green;
-      statusText = 'Bajarildi ✅';
+      statusBg = const Color(0xFFF0FDF4);
+      statusText = const Color(0xFF166534);
+      statusBorder = const Color(0xFFBBF7D0);
+      statusLabel = '✓ Bajarildi';
     } else if (status == 'submitted') {
-      statusColor = Colors.purple;
-      statusText = 'Tekshiruvda ⏳';
+      statusBg = const Color(0xFFFAF5FF);
+      statusText = const Color(0xFF6B21A8);
+      statusBorder = const Color(0xFFE9D5FF);
+      statusLabel = '⏳ Tekshiruvda';
     } else {
-      statusColor = Colors.amber.shade800;
-      statusText = 'Jarayonda';
+      statusBg = const Color(0xFFEEF2FF);
+      statusText = const Color(0xFF4338CA);
+      statusBorder = const Color(0xFFC7D2FE);
+      statusLabel = '● Jarayonda';
     }
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      elevation: 0.5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+    // Priority pill
+    Color pBg = const Color(0xFFF1F5F9);
+    Color pText = const Color(0xFF475569);
+    Color pBorder = const Color(0xFFE2E8F0);
+    String pLabel = 'Oddiy';
+    if (priority == 'urgent') {
+      pBg = const Color(0xFFFEF2F2);
+      pText = const Color(0xFF991B1B);
+      pBorder = const Color(0xFFFECACA);
+      pLabel = '🚨 Shoshilinch';
+    } else if (priority == 'high') {
+      pBg = const Color(0xFFFFFBEB);
+      pText = const Color(0xFF92400E);
+      pBorder = const Color(0xFFFDE68A);
+      pLabel = '⚡ Muhim';
+    }
+
+    // Checkpoint completion ratio
+    final doneCheckpoints = checkpoints.where((c) => c is Map && c['is_done'] == true).length;
+    final checkpointRatio = checkpoints.isEmpty ? 0.0 : doneCheckpoints / checkpoints.length;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Top Row: Priority, Status and Actions
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    task.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                ),
+                // Priority pill
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
+                    color: pBg,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: statusColor.withValues(alpha: 0.5)),
+                    border: Border.all(color: pBorder),
                   ),
                   child: Text(
-                    statusText,
-                    style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 11),
+                    pLabel,
+                    style: TextStyle(color: pText, fontWeight: FontWeight.bold, fontSize: 11),
                   ),
                 ),
-                if (user.role == UserRole.director) ...[
-                  const SizedBox(width: 4),
+                const SizedBox(width: 8),
+                // Status pill
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2.5),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: statusBorder),
+                  ),
+                  child: Text(
+                    statusLabel,
+                    style: TextStyle(color: statusText, fontWeight: FontWeight.bold, fontSize: 11),
+                  ),
+                ),
+                const Spacer(),
+                if (user.role == UserRole.director)
                   IconButton(
-                    icon: const Icon(Icons.delete_outline, size: 18, color: Colors.grey),
+                    icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFF94A3B8)),
+                    tooltip: 'Vazifani o\'chirish',
+                    visualDensity: VisualDensity.compact,
                     onPressed: () => _deleteTask(task),
                   ),
-                ],
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            // Metadata: Xodim, Muddat, Bonus
+            // Task Name / Title
+            Text(
+              task.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                color: Color(0xFF0F172A),
+                letterSpacing: -0.2,
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Metadata Row: Assignee, Deadline, Bonus
             Wrap(
               spacing: 8,
-              runSpacing: 4,
+              runSpacing: 6,
               children: [
-                Chip(
-                  avatar: const Icon(Icons.person, size: 14),
-                  label: Text('$assignedTo', style: const TextStyle(fontSize: 11)),
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                // Assignee
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF4F46E5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            assignedTo.isNotEmpty ? assignedTo[0] : '?',
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(assignedTo, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+                    ],
+                  ),
                 ),
-                Chip(
-                  avatar: const Icon(Icons.calendar_today, size: 14),
-                  label: Text('$deadline', style: const TextStyle(fontSize: 11)),
-                  visualDensity: VisualDensity.compact,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                // Deadline
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.event_outlined, size: 14, color: Color(0xFF64748B)),
+                      const SizedBox(width: 5),
+                      Text(deadline, style: const TextStyle(fontSize: 12, color: Color(0xFF475569))),
+                    ],
+                  ),
                 ),
+                // Bonus
                 if (bonus > 0)
-                  Chip(
-                    avatar: const Icon(Icons.monetization_on, size: 14, color: Colors.green),
-                    label: Text('+${bonus.toInt()} so\'m', style: const TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold)),
-                    visualDensity: VisualDensity.compact,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0FDF4),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFBBF7D0)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.monetization_on, size: 14, color: Color(0xFF16A34A)),
+                        const SizedBox(width: 5),
+                        Text(
+                          '+${bonus.toInt()} so\'m',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+                        ),
+                      ],
+                    ),
                   ),
               ],
             ),
 
-            // Checkpoints / Nazorat punktlari
+            // Checkpoints / Subtasks Section
             if (checkpoints.isNotEmpty) ...[
-              const SizedBox(height: 10),
-              const Text('Bosqichlar:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+              const SizedBox(height: 14),
+              // Progress Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Bosqichlar: $doneCheckpoints/${checkpoints.length} bajarildi',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+                  ),
+                  Text(
+                    '${(checkpointRatio * 100).toInt()}%',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: checkpointRatio == 1.0 ? const Color(0xFF16A34A) : const Color(0xFF4F46E5),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: checkpointRatio,
+                  minHeight: 5,
+                  backgroundColor: const Color(0xFFF1F5F9),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    checkpointRatio == 1.0 ? const Color(0xFF16A34A) : const Color(0xFF4F46E5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Checkpoint Items
               ...checkpoints.asMap().entries.map((entry) {
                 final c = entry.value;
                 final isDone = c is Map && c['is_done'] == true;
@@ -624,19 +991,24 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
                             setState(() {});
                           }
                         },
+                  borderRadius: BorderRadius.circular(6),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                     child: Row(
                       children: [
-                        Icon(isDone ? Icons.check_box : Icons.check_box_outline_blank, size: 16, color: isDone ? Colors.green : Colors.grey),
-                        const SizedBox(width: 6),
+                        Icon(
+                          isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+                          size: 16,
+                          color: isDone ? const Color(0xFF16A34A) : const Color(0xFF94A3B8),
+                        ),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             '$cTitle',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 13,
                               decoration: isDone ? TextDecoration.lineThrough : null,
-                              color: isDone ? Colors.grey : Colors.black87,
+                              color: isDone ? const Color(0xFF94A3B8) : const Color(0xFF1E293B),
                             ),
                           ),
                         ),
@@ -648,42 +1020,78 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
             ],
 
             // Action Buttons (Workflow & RBAC)
+            const SizedBox(height: 14),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
             const SizedBox(height: 12),
+
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (status == 'active')
-                  FilledButton.icon(
-                    onPressed: () => _submitTask(task),
-                    icon: const Icon(Icons.send, size: 14),
-                    label: const Text('Topshirish', style: TextStyle(fontSize: 12)),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.indigo,
-                      visualDensity: VisualDensity.compact,
-                    ),
+                // Timestamp / Created by or Approved by
+                if (status == 'done')
+                  Row(
+                    children: [
+                      const Icon(Icons.check_circle, size: 14, color: Color(0xFF16A34A)),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Tasdiqlandi: ${task.meta['approved_by'] ?? "Direktor"}',
+                        style: const TextStyle(fontSize: 11, color: Color(0xFF15803D), fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  )
+                else
+                  Text(
+                    'Biriktirdi: ${task.meta['assigned_by'] ?? "Direktor"}',
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
                   ),
-                if (status == 'submitted') ...[
-                  OutlinedButton.icon(
-                    onPressed: () async {
-                      final tool = widget.service.schema.tools.firstWhere((t) => t.name == 'kpi_reject');
-                      await tool.handler({'id': task.id, 'reason': 'Qayta ishlansin'});
-                      if (mounted) setState(() {});
-                    },
-                    icon: const Icon(Icons.replay, size: 14, color: Colors.orange),
-                    label: const Text('Qaytarish', style: TextStyle(fontSize: 12, color: Colors.orange)),
-                    style: OutlinedButton.styleFrom(visualDensity: VisualDensity.compact),
-                  ),
-                  const SizedBox(width: 8),
-                  FilledButton.icon(
-                    onPressed: () => _approveTask(task),
-                    icon: const Icon(Icons.check, size: 14),
-                    label: const Text('Tasdiqlash', style: TextStyle(fontSize: 12)),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                ],
+
+                // Workflow action buttons
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (status == 'active')
+                      FilledButton.icon(
+                        onPressed: () => _submitTask(task),
+                        icon: const Icon(Icons.send_rounded, size: 14),
+                        label: const Text('Topshirish', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF4F46E5),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          elevation: 0,
+                        ),
+                      ),
+                    if (status == 'submitted') ...[
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          final tool = widget.service.schema.tools.firstWhere((t) => t.name == 'kpi_reject');
+                          await tool.handler({'id': task.id, 'reason': 'Qayta ishlansin'});
+                          if (mounted) setState(() {});
+                        },
+                        icon: const Icon(Icons.replay_rounded, size: 14, color: Color(0xFFD97706)),
+                        label: const Text('Qaytarish', style: TextStyle(fontSize: 12, color: Color(0xFFD97706), fontWeight: FontWeight.w600)),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFFDE68A)),
+                          backgroundColor: const Color(0xFFFFFBEB),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FilledButton.icon(
+                        onPressed: () => _approveTask(task),
+                        icon: const Icon(Icons.check_circle_rounded, size: 14),
+                        label: const Text('Tasdiqlash & To\'lash', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF16A34A),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          elevation: 0,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ],
@@ -725,7 +1133,12 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
   final List<String> _checkpoints = [];
   final _checkpointController = TextEditingController();
 
-  final List<String> _employees = ['Ali', 'Sardor', 'Vali', 'Malika'];
+  final List<Map<String, String>> _employees = [
+    {'name': 'Ali', 'role': 'Xodim', 'dept': 'Ijrochi'},
+    {'name': 'Sardor', 'role': 'Menejer', 'dept': 'Savdo'},
+    {'name': 'Vali', 'role': 'Dasturchi', 'dept': 'IT Bo\'lim'},
+    {'name': 'Malika', 'role': 'Kassir', 'dept': 'Moliya'},
+  ];
 
   void _addPreset(String name, String emp, String bonus) {
     _nameController.text = name;
@@ -769,213 +1182,527 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Yangi Vazifa Yaratish',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Xodimga vazifa yuklatish, muddat va bonus belgilash',
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          const SizedBox(height: 16),
+    final isAiActive = widget.pluginManager?.isPluginActive('plugin_uzbek_ai') == true;
 
-          // Plagin: O'zbekcha AI Ekosistema Assistent
-          if (widget.pluginManager?.isPluginActive('plugin_uzbek_ai') == true) ...[
-            Card(
-              elevation: 0,
-              color: Colors.purple.shade50,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.purple.shade200),
-              ),
-              child: ListTile(
-                dense: true,
-                leading: const Icon(Icons.auto_awesome, color: Colors.purple),
-                title: const Text(
-                  'AI Ovozli va Matnli Buyruq (10% Oylik Bonusi)',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.purple),
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 840),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Page Header
+              const Text(
+                'Yangi Vazifa Biriktirish',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.4,
                 ),
-                subtitle: const Text(
-                  'Tabiiy tilda topshiriq bering, AI bonus va xavfsizlik chegarasini o\'zi hisoblaydi',
-                  style: TextStyle(fontSize: 11),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.purple),
-                onTap: widget.onOpenAi,
               ),
-            ),
-            const SizedBox(height: 16),
-          ],
-
-          // Tezkor namunalar
-          const Text('Tezkor namunalar:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            children: [
-              ActionChip(
-                label: const Text('Oy yakuni hisoboti (Ali)'),
-                onPressed: () => _addPreset('Oy yakuni hisoboti', 'Ali', '500000'),
+              const SizedBox(height: 4),
+              const Text(
+                'Xodimga yangi KPI topshirig\'ini yuklash, muddat va moliyaviy bonus belgilash',
+                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
               ),
-              ActionChip(
-                label: const Text('Mijozlar bazasini tozalash (Sardor)'),
-                onPressed: () => _addPreset('Mijozlar bazasini tozalash', 'Sardor', '300000'),
-              ),
-              ActionChip(
-                label: const Text('Dasturiy testlarni o\'tkazish (Vali)'),
-                onPressed: () => _addPreset('Dasturiy testlarni o\'tkazish', 'Vali', '700000'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-          // Vazifa nomi
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Vazifa nomi *',
-              hintText: 'Masalan: Serverni yangilash va zaxiralash',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Ijrochini tanlash
-          const Text('Biriktirilgan xodim:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            children: _employees.map((emp) {
-              final isSel = _selectedEmployee == emp;
-              return ChoiceChip(
-                label: Text(emp),
-                selected: isSel,
-                onSelected: (val) {
-                  if (val) setState(() => _selectedEmployee = emp);
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-
-          // Muddat
-          const Text('Tugash muddati:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            children: ['Bugun', 'Ertaga', '3 kunda', '1 haftada', '1 oyda'].map((d) {
-              final isSel = _selectedDeadline == d;
-              return ChoiceChip(
-                label: Text(d),
-                selected: isSel,
-                onSelected: (val) {
-                  if (val) setState(() => _selectedDeadline = d);
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-
-          // Bonus
-          TextField(
-            controller: _bonusController,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Bonus summasi (so\'m)',
-              hintText: '500000',
-              prefixIcon: Icon(Icons.monetization_on_outlined),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Ustuvorlik
-          const Text('Ustuvorlik:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            children: [
-              {'id': 'normal', 'label': 'Oddiy'},
-              {'id': 'high', 'label': 'Muhim'},
-              {'id': 'urgent', 'label': 'Shoshilinch'},
-            ].map((p) {
-              final isSel = _selectedPriority == p['id'];
-              return ChoiceChip(
-                label: Text(p['label']!),
-                selected: isSel,
-                onSelected: (val) {
-                  if (val) setState(() => _selectedPriority = p['id']!);
-                },
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 16),
-
-          // Nazorat punktlari (Checkpoints)
-          const Text('Nazorat punktlari (Qadamlar):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _checkpointController,
-                  decoration: const InputDecoration(
-                    hintText: 'Qadam nomi (masalan: 1-bosqich: Dastlabki reja)',
-                    isDense: true,
-                    border: OutlineInputBorder(),
+              // AI Smart Delegation Banner
+              if (isAiActive) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF4338CA)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                          ),
+                          child: const Icon(Icons.auto_awesome, color: Color(0xFFC7D2FE), size: 24),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'O\'zbekcha AI Ekosistema Assistent',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: const Color(0xFF34D399).withValues(alpha: 0.4)),
+                                    ),
+                                    child: const Text('10% BONUS & LIMIT', style: TextStyle(color: Color(0xFF6EE7B7), fontSize: 9, fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Tabiiy tilda topshiriq bering: AI muddat, xodim va xavfsiz 10% bonusni o\'zi hisoblaydi.',
+                                style: TextStyle(color: Color(0xFFCBD5E1), fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        FilledButton.icon(
+                          onPressed: widget.onOpenAi,
+                          icon: const Icon(Icons.flash_on_rounded, size: 16),
+                          label: const Text('AI Oyna', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: const Color(0xFF312E81),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
+                const SizedBox(height: 20),
+              ],
+
+              // Quick Templates (Presets)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tezkor namunalar (1-klikda to\'ldirish):',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _buildPresetChip('⚡ Oy yakuni hisoboti (Ali • 500k)', 'Oy yakuni hisoboti', 'Ali', '500000'),
+                        _buildPresetChip('🎯 Mijozlar bazasi auditi (Sardor • 300k)', 'Mijozlar bazasi auditi', 'Sardor', '300000'),
+                        _buildPresetChip('🚀 Dasturiy testlarni o\'tkazish (Vali • 700k)', 'Dasturiy testlarni o\'tkazish', 'Vali', '700000'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 8),
-              ElevatedButton.icon(
-                onPressed: () {
-                  final text = _checkpointController.text.trim();
-                  if (text.isNotEmpty) {
-                    setState(() {
-                      _checkpoints.add(text);
-                      _checkpointController.clear();
-                    });
-                  }
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Qo\'shish'),
+              const SizedBox(height: 20),
+
+              // Main Form Card
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Field 1: Vazifa nomi
+                    const Text('Vazifa Nomi *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _nameController,
+                      style: const TextStyle(fontSize: 14, color: Color(0xFF0F172A)),
+                      decoration: InputDecoration(
+                        hintText: 'Masalan: Serverni yangilash va zaxiralash',
+                        hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Field 2: Biriktirilgan xodim (Selectable User Cards)
+                    const Text('Ijrochi Xodim *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: _employees.map((emp) {
+                        final isSel = _selectedEmployee == emp['name'];
+                        return InkWell(
+                          onTap: () => setState(() => _selectedEmployee = emp['name']!),
+                          borderRadius: BorderRadius.circular(12),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isSel ? const Color(0xFFEEF2FF) : const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSel ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
+                                width: isSel ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: isSel ? const Color(0xFF4F46E5) : const Color(0xFF94A3B8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      emp['name']![0],
+                                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      emp['name']!,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isSel ? FontWeight.bold : FontWeight.w600,
+                                        color: isSel ? const Color(0xFF312E81) : const Color(0xFF334155),
+                                      ),
+                                    ),
+                                    Text(
+                                      '${emp['role']} • ${emp['dept']}',
+                                      style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                                    ),
+                                  ],
+                                ),
+                                if (isSel) ...[
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF4F46E5)),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Field 3 & 4: Deadline & Priority in 2 Columns
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Deadline
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Tugash Muddati *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: ['Bugun', 'Ertaga', '3 kunda', '1 haftada', '1 oyda'].map((d) {
+                                  final isSel = _selectedDeadline == d;
+                                  return ChoiceChip(
+                                    label: Text(d),
+                                    selected: isSel,
+                                    selectedColor: const Color(0xFFEEF2FF),
+                                    backgroundColor: const Color(0xFFF8FAFC),
+                                    labelStyle: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                                      color: isSel ? const Color(0xFF4338CA) : const Color(0xFF475569),
+                                    ),
+                                    side: BorderSide(
+                                      color: isSel ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
+                                    ),
+                                    onSelected: (val) {
+                                      if (val) setState(() => _selectedDeadline = d);
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Priority
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Ustuvorlik *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: [
+                                  {'id': 'normal', 'label': 'Oddiy'},
+                                  {'id': 'high', 'label': '⚡ Muhim'},
+                                  {'id': 'urgent', 'label': '🚨 Shoshilinch'},
+                                ].map((p) {
+                                  final isSel = _selectedPriority == p['id'];
+                                  return ChoiceChip(
+                                    label: Text(p['label']!),
+                                    selected: isSel,
+                                    selectedColor: const Color(0xFFEEF2FF),
+                                    backgroundColor: const Color(0xFFF8FAFC),
+                                    labelStyle: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                                      color: isSel ? const Color(0xFF4338CA) : const Color(0xFF475569),
+                                    ),
+                                    side: BorderSide(
+                                      color: isSel ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
+                                    ),
+                                    onSelected: (val) {
+                                      if (val) setState(() => _selectedPriority = p['id']!);
+                                    },
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Field 5: Bonus Summasi
+                    const Text('Bonus Summasi (UZS)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _bonusController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF15803D)),
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.monetization_on_outlined, size: 20, color: Color(0xFF16A34A)),
+                        hintText: '500000',
+                        filled: true,
+                        fillColor: const Color(0xFFF8FAFC),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Color(0xFF16A34A), width: 1.5),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0FDF4),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFBBF7D0)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.shield_outlined, size: 14, color: Color(0xFF16A34A)),
+                          SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'Xavfsizlik chegarasi: Maksimal 2,000,000 UZS. Chegaradan oshgan qism avtomatik cheklanadi.',
+                              style: TextStyle(fontSize: 11, color: Color(0xFF15803D), fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Field 6: Nazorat punktlari (Bosqichlar / Checkpoints)
+                    const Text('Nazorat punktlari (Rejadagi qadamlar):', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _checkpointController,
+                            style: const TextStyle(fontSize: 13),
+                            decoration: InputDecoration(
+                              hintText: 'Masalan: 1-bosqich: Loyihani tahlil qilish',
+                              hintStyle: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            ),
+                            onSubmitted: (_) {
+                              final text = _checkpointController.text.trim();
+                              if (text.isNotEmpty) {
+                                setState(() {
+                                  _checkpoints.add(text);
+                                  _checkpointController.clear();
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        FilledButton.icon(
+                          onPressed: () {
+                            final text = _checkpointController.text.trim();
+                            if (text.isNotEmpty) {
+                              setState(() {
+                                _checkpoints.add(text);
+                                _checkpointController.clear();
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: const Text('Qo\'shish'),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFF334155),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_checkpoints.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      ..._checkpoints.asMap().entries.map((e) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF8FAFC),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Center(
+                                  child: Text('${e.key + 1}', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(e.value, style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B))),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close, size: 16, color: Color(0xFF94A3B8)),
+                                visualDensity: VisualDensity.compact,
+                                onPressed: () => setState(() => _checkpoints.removeAt(e.key)),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                    const SizedBox(height: 28),
+
+                    // Primary Submit Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: FilledButton.icon(
+                        onPressed: _saveTask,
+                        icon: const Icon(Icons.add_task_rounded, size: 18),
+                        label: const Text(
+                          'Vazifani Biriktirish & Ishga Tushirish',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF4F46E5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          if (_checkpoints.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            ..._checkpoints.asMap().entries.map((e) {
-              return ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.check_circle_outline, size: 18),
-                title: Text(e.value, style: const TextStyle(fontSize: 13)),
-                trailing: IconButton(
-                  icon: const Icon(Icons.close, size: 16),
-                  onPressed: () => setState(() => _checkpoints.removeAt(e.key)),
-                ),
-              );
-            }),
-          ],
-          const SizedBox(height: 24),
+        ),
+      ),
+    );
+  }
 
-          // Saqlash tugmasi
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: FilledButton.icon(
-              onPressed: _saveTask,
-              icon: const Icon(Icons.add_task),
-              label: const Text('Vazifani Yaratish va Biriktirish', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-              style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
-            ),
-          ),
-        ],
+  Widget _buildPresetChip(String label, String name, String emp, String bonus) {
+    return InkWell(
+      onTap: () => _addPreset(name, emp, bonus),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+        ),
       ),
     );
   }
@@ -1878,10 +2605,10 @@ class _KpiAiAssistantSheetState extends State<KpiAiAssistantSheet> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        left: 20,
-        right: 20,
-        top: 20,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        left: 24,
+        right: 24,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -1895,84 +2622,79 @@ class _KpiAiAssistantSheetState extends State<KpiAiAssistantSheet> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
-                    color: Colors.purple.shade50,
-                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFFFAF5FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE9D5FF)),
                   ),
-                  child: const Icon(Icons.auto_awesome, color: Colors.purple, size: 24),
+                  child: const Icon(Icons.auto_awesome, color: Color(0xFF9333EA), size: 22),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 14),
                 const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'O\'zbekcha AI Ekosistema Assistent',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
                       ),
                       Text(
-                        'Tabiiy tilda vazifa buyuring (10% bonus va xavfsizlik chegarasi)',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                        'Tabiiy tilda topshiriq bering • 10% bonus va xavfsizlik chegarasi',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                  icon: const Icon(Icons.close, size: 20, color: Color(0xFF94A3B8)),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Tezkor namunalar
-            const Text('Tezkor namunalar:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
-            const SizedBox(height: 6),
+            const Text('Tezkor namunalar:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF475569))),
+            const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              runSpacing: 4,
+              runSpacing: 6,
               children: [
-                ActionChip(
-                  label: const Text('Ali: 10% oylik bonusi', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    _controller.text = "Ali ga saytni bitirish vazifasini topshir va bitirsa oyligiga 10% qo'sh";
-                    _analyze();
-                  },
-                ),
-                ActionChip(
-                  label: const Text('Sardor: 300 000 bonus', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    _controller.text = "Sardorga mijozlar hisobotini tayyorlashni buyur, bonusi 300000";
-                    _analyze();
-                  },
-                ),
-                ActionChip(
-                  label: const Text('Vali: 50% qo\'sh (Chegara testi)', style: TextStyle(fontSize: 11)),
-                  onPressed: () {
-                    _controller.text = "Valiga yangi modul topshir va 50% qo'sh";
-                    _analyze();
-                  },
-                ),
+                _buildPromptChip('Ali: 10% oylik bonusi', "Ali ga saytni bitirish vazifasini topshir va bitirsa oyligiga 10% qo'sh"),
+                _buildPromptChip('Sardor: 300 000 bonus', "Sardorga mijozlar hisobotini tayyorlashni buyur, bonusi 300000"),
+                _buildPromptChip('Vali: 50% qo\'sh (Chegara)', "Valiga yangi modul topshir va 50% qo'sh"),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
             // Buyruq kiritish maydoni
             TextField(
               controller: _controller,
               maxLines: 2,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF0F172A)),
               decoration: InputDecoration(
                 hintText: 'Masalan: Ali ga saytni bitirish vazifasini topshir va bitirsa oyligiga 10% qo\'sh',
+                hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
                 filled: true,
-                fillColor: const Color(0xFFF8F9FA),
+                fillColor: const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFF9333EA), width: 1.5),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
 
             // Tahlil qilish tugmasi
             SizedBox(
@@ -1982,26 +2704,32 @@ class _KpiAiAssistantSheetState extends State<KpiAiAssistantSheet> {
                 onPressed: _isLoading ? null : _analyze,
                 icon: _isLoading
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Icon(Icons.psychology, size: 18),
-                label: Text(_isLoading ? 'AI tahlil qilmoqda...' : 'AI Buyrug\'ini Tahlil Qilish'),
-                style: FilledButton.styleFrom(backgroundColor: Colors.purple),
+                    : const Icon(Icons.psychology_outlined, size: 18),
+                label: Text(
+                  _isLoading ? 'AI tahlil qilmoqda...' : 'AI Buyrug\'ini Tahlil Qilish',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF7C3AED),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
               ),
             ),
 
             if (_error.isNotEmpty) ...[
               const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.red.shade200),
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFECACA)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                    const Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 18),
                     const SizedBox(width: 8),
-                    Expanded(child: Text(_error, style: const TextStyle(color: Colors.red, fontSize: 12))),
+                    Expanded(child: Text(_error, style: const TextStyle(color: Color(0xFFB91C1C), fontSize: 12))),
                   ],
                 ),
               ),
@@ -2010,88 +2738,119 @@ class _KpiAiAssistantSheetState extends State<KpiAiAssistantSheet> {
             // Tahlil natijasi
             if (_result != null) ...[
               const SizedBox(height: 16),
-              Card(
-                elevation: 0,
-                color: Colors.purple.shade50.withValues(alpha: 0.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.purple.shade200),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAF5FF),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE9D5FF)),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.verified, color: Colors.green, size: 18),
-                          const SizedBox(width: 6),
-                          const Text('AI Tahlil Natijasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.purple,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: const Text('Tayyor', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                          ),
-                        ],
-                      ),
-                      const Divider(height: 16),
-                      Text('• Vazifa: ${_result!['name']}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 4),
-                      Text('• Biriktirildi: ${_result!['assigned_to']}', style: const TextStyle(fontSize: 12)),
-                      const SizedBox(height: 4),
-                      Text(
-                        '• Hisoblangan bonus: ${(_result!['bonus_amount'] as num).toInt()} so\'m ${_result!['is_percent'] ? "(${_result!['percent_value']}% oylikdan)" : ""}',
-                        style: const TextStyle(fontSize: 12, color: Colors.indigo, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 4),
-                      Text('• Muddat: ${_result!['deadline']}', style: const TextStyle(fontSize: 12)),
-
-                      if (_result!['is_capped'] == true) ...[
-                        const SizedBox(height: 8),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.verified, color: Color(0xFF16A34A), size: 18),
+                        const SizedBox(width: 6),
+                        const Text('AI Tahlil Natijasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A))),
+                        const Spacer(),
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.amber.shade100,
+                            color: const Color(0xFF9333EA),
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: Colors.amber.shade600),
                           ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.warning_amber, color: Colors.amber, size: 16),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  '${_result!['warning']}',
-                                  style: TextStyle(fontSize: 11, color: Colors.brown.shade900, fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ],
-                          ),
+                          child: const Text('Tayyor', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                         ),
                       ],
+                    ),
+                    const Divider(height: 20, color: Color(0xFFE9D5FF)),
+                    Text(
+                      '• Vazifa: ${_result!['name']}',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '• Biriktirildi: ${_result!['assigned_to']}',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '• Hisoblangan bonus: ${(_result!['bonus_amount'] as num).toInt()} so\'m ${_result!['is_percent'] ? "(${_result!['percent_value']}% oylikdan)" : ""}',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF15803D), fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '• Muddat: ${_result!['deadline']}',
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                    ),
 
-                      const SizedBox(height: 14),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 42,
-                        child: FilledButton.icon(
-                          onPressed: _confirmAndCreate,
-                          icon: const Icon(Icons.add_task, size: 16),
-                          label: const Text('Tasdiqlash va Vazifani Saqlash', style: TextStyle(fontWeight: FontWeight.bold)),
-                          style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+                    if (_result!['is_capped'] == true) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFFBEB),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFDE68A)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 16),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                '${_result!['warning']}',
+                                style: const TextStyle(fontSize: 11, color: Color(0xFF92400E), fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
-                  ),
+
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: FilledButton.icon(
+                        onPressed: _confirmAndCreate,
+                        icon: const Icon(Icons.add_task_rounded, size: 16),
+                        label: const Text('Tasdiqlash va Vazifani Saqlash', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF4F46E5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
             const SizedBox(height: 10),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPromptChip(String label, String prompt) {
+    return InkWell(
+      onTap: () {
+        _controller.text = prompt;
+        _analyze();
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Color(0xFF475569)),
         ),
       ),
     );
