@@ -114,7 +114,7 @@ class KpiService {
               'note': const ParamDef(type: 'string', description: 'Bajarilgan ish hisoboti / izoh', required: false),
             },
             handler: (p) async {
-              final targetKey = p['name'];
+              final targetKey = p['id'] ?? p['name'];
               final existing = store.find(targetKey);
               if (existing == null) return ToolResult.err(error: "'$targetKey' vazifasi topilmadi.");
 
@@ -149,7 +149,7 @@ class KpiService {
               'approved_by': const ParamDef(type: 'string', description: 'Tasdiqlagan rahbar', required: false),
             },
             handler: (p) async {
-              final targetKey = p['name'];
+              final targetKey = p['id'] ?? p['name'];
               final existing = store.find(targetKey);
               if (existing == null) return ToolResult.err(error: "'$targetKey' topilmadi.");
 
@@ -186,7 +186,7 @@ class KpiService {
               'reason': const ParamDef(type: 'string', description: 'Qaytarish sababi / ko\'rsatma'),
             },
             handler: (p) async {
-              final targetKey = p['name'];
+              final targetKey = p['id'] ?? p['name'];
               final existing = store.find(targetKey);
               if (existing == null) return ToolResult.err(error: "'$targetKey' topilmadi.");
 
@@ -220,7 +220,7 @@ class KpiService {
               'done': const ParamDef(type: 'boolean', description: 'Bajarildimi (true/false)'),
             },
             handler: (p) async {
-              final targetKey = p['name'];
+              final targetKey = p['id'] ?? p['name'];
               final existing = store.find(targetKey);
               if (existing == null) return ToolResult.err(error: "'$targetKey' topilmadi.");
 
@@ -267,7 +267,7 @@ class KpiService {
               'deadline': const ParamDef(type: 'string', description: 'Sana yoki kun (masalan: 3 kundan keyin)'),
             },
             handler: (p) async {
-              final targetKey = p['name'];
+              final targetKey = p['id'] ?? p['name'];
               final existing = store.find(targetKey);
               if (existing == null) return ToolResult.err(error: "'$targetKey' topilmadi.");
 
@@ -294,7 +294,7 @@ class KpiService {
               'note': const ParamDef(type: 'string', description: 'Ko\'rsatma', defaultValue: 'Tezroq yakunlansin'),
             },
             handler: (p) async {
-              final targetKey = p['name'];
+              final targetKey = p['id'] ?? p['name'];
               final existing = store.find(targetKey);
               if (existing == null) return ToolResult.err(error: "'$targetKey' topilmadi.");
 
