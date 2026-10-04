@@ -1,0 +1,13 @@
+name: be_core
+description: Business Ecosystem Core Protocol, Unified Data Store, and Uzbek NLP
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  http: ^1.2.0
+
+dev_dependencies:
+  lints: ^3.0.0
