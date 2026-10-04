@@ -138,6 +138,20 @@ class _KpiMainShellState extends State<KpiMainShell> {
     if (mounted) setState(() {});
   }
 
+  void _openAiAssistant(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => KpiAiAssistantSheet(
+        pluginManager: widget.pluginManager,
+        service: widget.service,
+        security: _security,
+        onTaskCreated: () => setState(() => _currentIndex = 0),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeCount = widget.service.store.all.where((e) => e.status == 'active').length;
@@ -194,6 +208,13 @@ class _KpiMainShellState extends State<KpiMainShell> {
           ],
         ),
         actions: [
+          // Plagin: O'zbekcha AI Ekosistema Assistent
+          if (widget.pluginManager.isPluginActive('plugin_uzbek_ai'))
+            IconButton(
+              icon: const Icon(Icons.auto_awesome, color: Colors.purple),
+              tooltip: "O'zbekcha AI Assistent",
+              onPressed: () => _openAiAssistant(context),
+            ),
           Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -226,6 +247,8 @@ class _KpiMainShellState extends State<KpiMainShell> {
           KpiCreateTaskTab(
             service: widget.service,
             security: _security,
+            pluginManager: widget.pluginManager,
+            onOpenAi: () => _openAiAssistant(context),
             onTaskCreated: () => setState(() => _currentIndex = 0),
           ),
           // Tab 2: Profil & Sozlamalar (Core Profile & Settings)
@@ -343,9 +366,22 @@ class _KpiTasksTabState extends State<KpiTasksTab> {
     await tool.handler({'id': task.id, 'approved_by': user.name});
 
     // Moliya kassa chiqimi (bonus to'lovi)
-    final bonus = UzbekNlp.parseNumber(task.meta['bonus_amount']);
+    final bonus = UzbekNlp.parseNumber(task.meta['bonus_amount']).toDouble();
     final employee = task.meta['assigned_to'] ?? 'Xodim';
     if (bonus > 0) {
+      // 1. Ekotizim Voqealar Shinası (EventBus) orqali e'lon qilish -> Bridge plaginini avtomat ishga tushiradi
+      await EventBus.instance.publish(EcosystemEvent(
+        name: 'kpi_task_approved',
+        sourceApp: 'kpi',
+        payload: {
+          'task_id': task.id,
+          'assigned_to': '$employee',
+          'bonus_amount': bonus,
+          'task_name': task.name,
+        },
+      ));
+
+      // 2. Mahalliy zaxira yozish
       await recordFinanceBonusExpense(
         employee: '$employee',
         amount: bonus,
@@ -666,11 +702,15 @@ class KpiCreateTaskTab extends StatefulWidget {
     required this.service,
     required this.security,
     required this.onTaskCreated,
+    this.pluginManager,
+    this.onOpenAi,
   });
 
   final KpiService service;
   final SecurityManager security;
   final VoidCallback onTaskCreated;
+  final PluginManager? pluginManager;
+  final VoidCallback? onOpenAi;
 
   @override
   State<KpiCreateTaskTab> createState() => _KpiCreateTaskTabState();
@@ -744,6 +784,33 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
             style: TextStyle(fontSize: 13, color: Colors.grey),
           ),
           const SizedBox(height: 16),
+
+          // Plagin: O'zbekcha AI Ekosistema Assistent
+          if (widget.pluginManager?.isPluginActive('plugin_uzbek_ai') == true) ...[
+            Card(
+              elevation: 0,
+              color: Colors.purple.shade50,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.purple.shade200),
+              ),
+              child: ListTile(
+                dense: true,
+                leading: const Icon(Icons.auto_awesome, color: Colors.purple),
+                title: const Text(
+                  'AI Ovozli va Matnli Buyruq (10% Oylik Bonusi)',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.purple),
+                ),
+                subtitle: const Text(
+                  'Tabiiy tilda topshiriq bering, AI bonus va xavfsizlik chegarasini o\'zi hisoblaydi',
+                  style: TextStyle(fontSize: 11),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.purple),
+                onTap: widget.onOpenAi,
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
 
           // Tezkor namunalar
           const Text('Tezkor namunalar:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
@@ -1093,10 +1160,43 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
             ),
             child: Column(
               children: plugins.map((plugin) {
+                final isConfigurable = plugin.id == 'plugin_uzbek_ai' || plugin.id == 'plugin_ecosystem_bridge';
                 return SwitchListTile(
                   dense: true,
-                  secondary: const Icon(Icons.extension_outlined, color: Colors.purple),
-                  title: Text(plugin.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  secondary: Icon(
+                    plugin.id == 'plugin_uzbek_ai'
+                        ? Icons.auto_awesome
+                        : (plugin.id == 'plugin_ecosystem_bridge' ? Icons.sync_alt : Icons.extension_outlined),
+                    color: Colors.purple,
+                  ),
+                  title: Row(
+                    children: [
+                      Expanded(
+                        child: Text(plugin.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                      ),
+                      if (isConfigurable)
+                        InkWell(
+                          onTap: () => _showPluginConfigDialog(context, plugin),
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.purple.shade50,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: Colors.purple.shade200),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.tune, size: 11, color: Colors.purple),
+                                SizedBox(width: 3),
+                                Text('Sozlash', style: TextStyle(fontSize: 10, color: Colors.purple, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                   subtitle: Text(plugin.description, style: const TextStyle(fontSize: 11)),
                   value: plugin.isEnabled,
                   onChanged: (val) async {
@@ -1112,4 +1212,458 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
       ),
     );
   }
+
+  void _showPluginConfigDialog(BuildContext context, EcosystemPlugin plugin) {
+    showDialog(
+      context: context,
+      builder: (ctx) => KpiPluginConfigDialog(
+        plugin: plugin,
+        pluginManager: widget.pluginManager,
+        onSaved: () => setState(() {}),
+      ),
+    );
+  }
 }
+
+// ============================================================================
+// PLAGIN: O'ZBEKCHA AI EKOTIZIM ASSISTENTI (MODAL BOTTOM SHEET)
+// ============================================================================
+class KpiAiAssistantSheet extends StatefulWidget {
+  const KpiAiAssistantSheet({
+    super.key,
+    required this.pluginManager,
+    required this.service,
+    required this.security,
+    required this.onTaskCreated,
+  });
+
+  final PluginManager pluginManager;
+  final KpiService service;
+  final SecurityManager security;
+  final VoidCallback onTaskCreated;
+
+  @override
+  State<KpiAiAssistantSheet> createState() => _KpiAiAssistantSheetState();
+}
+
+class _KpiAiAssistantSheetState extends State<KpiAiAssistantSheet> {
+  final _controller = TextEditingController(
+    text: "Ali ga saytni bitirish vazifasini topshir va bitirsa oyligiga 10% qo'sh",
+  );
+  bool _isLoading = false;
+  Map<String, dynamic>? _result;
+  String _error = '';
+
+  void _analyze() async {
+    final prompt = _controller.text.trim();
+    if (prompt.isEmpty) return;
+
+    setState(() {
+      _isLoading = true;
+      _error = '';
+      _result = null;
+    });
+
+    final res = await widget.pluginManager.executeCommand(
+      'plugin_uzbek_ai',
+      'parse_task_order',
+      {'prompt': prompt},
+    );
+
+    setState(() {
+      _isLoading = false;
+      if (res['success'] == true) {
+        _result = res;
+      } else {
+        _error = res['error'] ?? 'Buyruqni tahlil qilib bo\'lmadi.';
+      }
+    });
+  }
+
+  void _confirmAndCreate() async {
+    if (_result == null) return;
+
+    final tool = widget.service.schema.tools.firstWhere((t) => t.name == 'kpi_add');
+    await tool.handler({
+      'name': _result!['name'],
+      'assigned_to': _result!['assigned_to'],
+      'assigned_by': widget.security.currentUser.name,
+      'deadline': _result!['deadline'] ?? '3 kunda',
+      'bonus_amount': _result!['bonus_amount'] ?? 0,
+      'priority': _result!['priority'] ?? 'high',
+      'checkpoints': [
+        {'title': '1-bosqich: Dastlabki reja va tahlil', 'is_done': false},
+        {'title': '2-bosqich: Asosiy vazifani bajarish', 'is_done': false},
+        {'title': '3-bosqich: Yakunlash va topshirish', 'is_done': false},
+      ],
+    });
+
+    if (mounted) {
+      Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('AI Vazifasi yaratildi: "${_result!['name']}"')),
+      );
+      widget.onTaskCreated();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 20,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.auto_awesome, color: Colors.purple, size: 24),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'O\'zbekcha AI Ekosistema Assistent',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Tabiiy tilda vazifa buyuring (10% bonus va xavfsizlik chegarasi)',
+                        style: TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Tezkor namunalar
+            const Text('Tezkor namunalar:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                ActionChip(
+                  label: const Text('Ali: 10% oylik bonusi', style: TextStyle(fontSize: 11)),
+                  onPressed: () {
+                    _controller.text = "Ali ga saytni bitirish vazifasini topshir va bitirsa oyligiga 10% qo'sh";
+                    _analyze();
+                  },
+                ),
+                ActionChip(
+                  label: const Text('Sardor: 300 000 bonus', style: TextStyle(fontSize: 11)),
+                  onPressed: () {
+                    _controller.text = "Sardorga mijozlar hisobotini tayyorlashni buyur, bonusi 300000";
+                    _analyze();
+                  },
+                ),
+                ActionChip(
+                  label: const Text('Vali: 50% qo\'sh (Chegara testi)', style: TextStyle(fontSize: 11)),
+                  onPressed: () {
+                    _controller.text = "Valiga yangi modul topshir va 50% qo'sh";
+                    _analyze();
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Buyruq kiritish maydoni
+            TextField(
+              controller: _controller,
+              maxLines: 2,
+              decoration: InputDecoration(
+                hintText: 'Masalan: Ali ga saytni bitirish vazifasini topshir va bitirsa oyligiga 10% qo\'sh',
+                filled: true,
+                fillColor: const Color(0xFFF8F9FA),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Tahlil qilish tugmasi
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: FilledButton.icon(
+                onPressed: _isLoading ? null : _analyze,
+                icon: _isLoading
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Icon(Icons.psychology, size: 18),
+                label: Text(_isLoading ? 'AI tahlil qilmoqda...' : 'AI Buyrug\'ini Tahlil Qilish'),
+                style: FilledButton.styleFrom(backgroundColor: Colors.purple),
+              ),
+            ),
+
+            if (_error.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.red, size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(_error, style: const TextStyle(color: Colors.red, fontSize: 12))),
+                  ],
+                ),
+              ),
+            ],
+
+            // Tahlil natijasi
+            if (_result != null) ...[
+              const SizedBox(height: 16),
+              Card(
+                elevation: 0,
+                color: Colors.purple.shade50.withValues(alpha: 0.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.purple.shade200),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.verified, color: Colors.green, size: 18),
+                          const SizedBox(width: 6),
+                          const Text('AI Tahlil Natijasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text('Tayyor', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 16),
+                      Text('• Vazifa: ${_result!['name']}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 4),
+                      Text('• Biriktirildi: ${_result!['assigned_to']}', style: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 4),
+                      Text(
+                        '• Hisoblangan bonus: ${(_result!['bonus_amount'] as num).toInt()} so\'m ${_result!['is_percent'] ? "(${_result!['percent_value']}% oylikdan)" : ""}',
+                        style: const TextStyle(fontSize: 12, color: Colors.indigo, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text('• Muddat: ${_result!['deadline']}', style: const TextStyle(fontSize: 12)),
+
+                      if (_result!['is_capped'] == true) ...[
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade100,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.amber.shade600),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.warning_amber, color: Colors.amber, size: 16),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  '${_result!['warning']}',
+                                  style: TextStyle(fontSize: 11, color: Colors.brown.shade900, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 42,
+                        child: FilledButton.icon(
+                          onPressed: _confirmAndCreate,
+                          icon: const Icon(Icons.add_task, size: 16),
+                          label: const Text('Tasdiqlash va Vazifani Saqlash', style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// PLAGIN SOZLAMALARI VA CHEGARALAR DIALOGI (PLUGIN CONFIG DIALOG)
+// ============================================================================
+class KpiPluginConfigDialog extends StatefulWidget {
+  const KpiPluginConfigDialog({
+    super.key,
+    required this.plugin,
+    required this.pluginManager,
+    required this.onSaved,
+  });
+
+  final EcosystemPlugin plugin;
+  final PluginManager pluginManager;
+  final VoidCallback onSaved;
+
+  @override
+  State<KpiPluginConfigDialog> createState() => _KpiPluginConfigDialogState();
+}
+
+class _KpiPluginConfigDialogState extends State<KpiPluginConfigDialog> {
+  late final TextEditingController _limitController;
+
+  @override
+  void initState() {
+    super.initState();
+    final isAi = widget.plugin.id == 'plugin_uzbek_ai';
+    final curLimit = isAi
+        ? (widget.plugin.metadata['max_bonus_limit'] ?? 2000000)
+        : (widget.plugin.metadata['max_payout_limit'] ?? 3000000);
+    _limitController = TextEditingController(text: '$curLimit');
+  }
+
+  @override
+  void dispose() {
+    _limitController.dispose();
+    super.dispose();
+  }
+
+  void _save() async {
+    final val = double.tryParse(_limitController.text.trim()) ?? 2000000.0;
+    if (widget.plugin.id == 'plugin_uzbek_ai') {
+      widget.plugin.metadata['max_bonus_limit'] = val;
+      final handler = widget.pluginManager.getHandler('plugin_uzbek_ai') as UzbekAiPluginHandler?;
+      if (handler != null) {
+        handler.maxBonusLimit = val;
+      }
+    } else if (widget.plugin.id == 'plugin_ecosystem_bridge') {
+      widget.plugin.metadata['max_payout_limit'] = val;
+      final handler = widget.pluginManager.getHandler('plugin_ecosystem_bridge') as EcosystemBridgePluginHandler?;
+      if (handler != null) {
+        handler.maxPayoutLimit = val;
+      }
+    }
+    await widget.pluginManager.registerPlugin(widget.plugin);
+    if (mounted) {
+      Navigator.of(context).pop();
+      widget.onSaved();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isAi = widget.plugin.id == 'plugin_uzbek_ai';
+
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(isAi ? Icons.auto_awesome : Icons.sync_alt, color: Colors.purple),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              isAi ? 'AI Bonus Chegarasi' : 'Bridge Chiqim Chegarasi',
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isAi
+                  ? 'AI orqali topshiriq berilganda har bir vazifa uchun berilishi mumkin bo\'lgan maksimal bonus miqdori (Guardrail):'
+                  : 'KPI va CRM hodisalari orqali Moliyaga avtomatik kassa chiqimi yozilishining xavfsizlik chegarasi:',
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _limitController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: isAi ? 'Maksimal bonus chegarasi (so\'m)' : 'Maksimal chiqim chegarasi (so\'m)',
+                suffixText: 'so\'m',
+                border: const OutlineInputBorder(),
+              ),
+            ),
+            if (isAi) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.indigo.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Xodimlar bazaviy oyliklari:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                    SizedBox(height: 4),
+                    Text('• Ali: 5 000 000 so\'m (10% = 500 000)', style: TextStyle(fontSize: 11)),
+                    Text('• Sardor: 6 000 000 so\'m (10% = 600 000)', style: TextStyle(fontSize: 11)),
+                    Text('• Vali: 4 500 000 so\'m (10% = 450 000)', style: TextStyle(fontSize: 11)),
+                    Text('• Malika: 4 000 000 so\'m (10% = 400 000)', style: TextStyle(fontSize: 11)),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Bekor qilish'),
+        ),
+        FilledButton(
+          onPressed: _save,
+          child: const Text('Saqlash'),
+        ),
+      ],
+    );
+  }
+}
+
