@@ -982,7 +982,7 @@ class _KpiCreateTaskTabState extends State<KpiCreateTaskTab> {
 }
 
 // ============================================================================
-// TAB 2: PROFIL & SOZLAMALAR (CORE PROFILE & SETTINGS)
+// TAB 2: PROFIL & SOZLAMALAR (ENTERPRISE GRADE PROFILE & SETTINGS)
 // ============================================================================
 class KpiProfileTab extends StatefulWidget {
   const KpiProfileTab({
@@ -1002,216 +1002,7 @@ class KpiProfileTab extends StatefulWidget {
 
 class _KpiProfileTabState extends State<KpiProfileTab> {
   UserProfile get _profile => widget.profileManager.current;
-
-  @override
-  Widget build(BuildContext context) {
-    final plugins = widget.pluginManager.getAllPlugins();
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Profil Kartasi
-          Card(
-            elevation: 0.5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.grey.shade200),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.indigo.shade100,
-                    child: Text(
-                      _profile.name[0],
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.indigo),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _profile.name,
-                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${_profile.role.name.toUpperCase()} • ${_profile.department}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${_profile.phone}  |  ${_profile.email}',
-                          style: const TextStyle(fontSize: 11, color: Colors.blueGrey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Foydalanuvchini Almashtirish (RBAC)
-          const Text(
-            'Foydalanuvchi va Rolni Tanlash (RBAC)',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Column(
-            children: UserProfile.defaultProfiles.map((p) {
-              final isCurrent = p.id == _profile.id;
-              return Card(
-                elevation: 0,
-                color: isCurrent ? Colors.indigo.shade50 : Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  side: BorderSide(
-                    color: isCurrent ? Colors.indigo.shade300 : Colors.grey.shade200,
-                  ),
-                ),
-                child: ListTile(
-                  dense: true,
-                  leading: Icon(
-                    p.role == UserRole.director ? Icons.shield : Icons.person,
-                    color: isCurrent ? Colors.indigo : Colors.grey,
-                  ),
-                  title: Text(p.name, style: TextStyle(fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal)),
-                  subtitle: Text('${p.role.name} • ${p.department}'),
-                  trailing: isCurrent
-                      ? const Icon(Icons.check_circle, color: Colors.indigo)
-                      : const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
-                  onTap: () {
-                    widget.onProfileChanged(p);
-                    setState(() {});
-                  },
-                ),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 24),
-
-          // Tizim & Server Holati
-          const Text(
-            'Tizim va Microservice Holati',
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: BorderSide(color: Colors.grey.shade200),
-            ),
-            child: const Column(
-              children: [
-                ListTile(
-                  dense: true,
-                  leading: Icon(Icons.dns, color: Colors.green),
-                  title: Text('KPI Microservice Server'),
-                  subtitle: Text('Port: 8081  |  Holati: Faol (Online)'),
-                ),
-                Divider(height: 1),
-                ListTile(
-                  dense: true,
-                  leading: Icon(Icons.hub_outlined, color: Colors.blue),
-                  title: Text('Moliya & CRM Integratsiyasi'),
-                  subtitle: Text('Portlar: :8082 (CRM), :8083 (Moliya)'),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-
-          // Plaginlar Markazi (Microkernel Plugin Registry)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Plaginlar Markazi (Microkernel Engine)',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.purple.shade50,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  '${plugins.where((p) => p.isEnabled).length} ta faol',
-                  style: TextStyle(color: Colors.purple.shade700, fontSize: 11, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: BorderSide(color: Colors.grey.shade200),
-            ),
-            child: Column(
-              children: plugins.map((plugin) {
-                final isConfigurable = plugin.id == 'plugin_uzbek_ai' || plugin.id == 'plugin_ecosystem_bridge';
-                return SwitchListTile(
-                  dense: true,
-                  secondary: Icon(
-                    plugin.id == 'plugin_uzbek_ai'
-                        ? Icons.auto_awesome
-                        : (plugin.id == 'plugin_ecosystem_bridge' ? Icons.sync_alt : Icons.extension_outlined),
-                    color: Colors.purple,
-                  ),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Text(plugin.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                      ),
-                      if (isConfigurable)
-                        InkWell(
-                          onTap: () => _showPluginConfigDialog(context, plugin),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 6),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.purple.shade50,
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: Colors.purple.shade200),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.tune, size: 11, color: Colors.purple),
-                                SizedBox(width: 3),
-                                Text('Sozlash', style: TextStyle(fontSize: 10, color: Colors.purple, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  subtitle: Text(plugin.description, style: const TextStyle(fontSize: 11)),
-                  value: plugin.isEnabled,
-                  onChanged: (val) async {
-                    await widget.pluginManager.togglePlugin(plugin.id, val);
-                    setState(() {});
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-          const SizedBox(height: 30),
-        ],
-      ),
-    );
-  }
+  int _selectedSegment = 0; // 0: Profil & Rollar, 1: Plaginlar Markazi, 2: Infratuzilma & Audit
 
   void _showPluginConfigDialog(BuildContext context, EcosystemPlugin plugin) {
     showDialog(
@@ -1223,7 +1014,783 @@ class _KpiProfileTabState extends State<KpiProfileTab> {
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final plugins = widget.pluginManager.getAllPlugins();
+    final isDirector = _profile.role == UserRole.director;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 960),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // --------------------------------------------------------------
+              // 1. HERO EXECUTIVE PROFILE CARD (PREMIUM WORKSPACE IDENTITY)
+              // --------------------------------------------------------------
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 16,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Top Accent Banner Strip
+                    Container(
+                      height: 6,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF4F46E5), Color(0xFF818CF8), Color(0xFF06B6D4)],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Avatar with Status Ring
+                              Stack(
+                                children: [
+                                  Container(
+                                    width: 72,
+                                    height: 72,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [Color(0xFF3730A3), Color(0xFF4F46E5)],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        _profile.name[0],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 18,
+                                      height: 18,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 3),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 20),
+                              // Name, Role & Details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          _profile.name,
+                                          style: const TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF0F172A),
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Icon(Icons.verified, color: Color(0xFF4F46E5), size: 18),
+                                        const Spacer(),
+                                        // Enterprise Badge
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFEEF2FF),
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(color: const Color(0xFFC7D2FE)),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 6,
+                                                height: 6,
+                                                decoration: const BoxDecoration(
+                                                  color: Color(0xFF4F46E5),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
+                                                _profile.role.name.toUpperCase(),
+                                                style: const TextStyle(
+                                                  color: Color(0xFF3730A3),
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.bold,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '${_profile.department} Departamenti • Axion Software Inc.',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xFF475569),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    // Contact Meta Strip
+                                    Wrap(
+                                      spacing: 16,
+                                      runSpacing: 8,
+                                      children: [
+                                        _buildMetaItem(Icons.email_outlined, _profile.email),
+                                        _buildMetaItem(Icons.phone_outlined, _profile.phone),
+                                        _buildMetaItem(Icons.badge_outlined, 'ID: #${_profile.id.toUpperCase()}'),
+                                        _buildMetaItem(Icons.security, '2FA Himoyalangan'),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // --------------------------------------------------------------
+              // 2. EXECUTIVE METRICS STRIP (4 STATS CARDS)
+              // --------------------------------------------------------------
+              Row(
+                children: [
+                  Expanded(child: _buildMetricTile('Vazifalar Soni', '18 ta', '14 ta bajarilgan', const Color(0xFF4F46E5), Icons.task_alt)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildMetricTile('KPI Reytingi', '98.4%', 'A\'lo daraja', const Color(0xFF10B981), Icons.trending_up)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildMetricTile('Bonus Fondi', '2.5M UZS', 'Moliyadan tasdiqlangan', const Color(0xFF0284C7), Icons.monetization_on_outlined)),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildMetricTile('Vakolat Darajasi', isDirector ? 'Tier 1' : 'Tier 3', isDirector ? 'To\'liq nazorat' : 'Standart xodim', const Color(0xFF7C3AED), Icons.shield_outlined)),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // --------------------------------------------------------------
+              // 3. SEGMENTED TABS CONTROLLER (LINEAR / STRIPE STYLE)
+              // --------------------------------------------------------------
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE2E8F0).withValues(alpha: 0.6),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    _buildSegmentButton(0, Icons.manage_accounts_outlined, 'Foydalanuvchi & RBAC Rollar'),
+                    _buildSegmentButton(1, Icons.extension_outlined, 'Plaginlar Markazi (${plugins.length})'),
+                    _buildSegmentButton(2, Icons.dns_outlined, 'Infratuzilma & Xavfsizlik'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // --------------------------------------------------------------
+              // 4. SEGMENT CONTENT VIEWS
+              // --------------------------------------------------------------
+              if (_selectedSegment == 0) _buildRbacSection(),
+              if (_selectedSegment == 1) _buildPluginsSection(plugins),
+              if (_selectedSegment == 2) _buildInfrastructureSection(),
+
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Segment Tab Tugmasi
+  Widget _buildSegmentButton(int index, IconData icon, String label) {
+    final isSelected = _selectedSegment == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedSegment = index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  color: isSelected ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 1-BO'LIM: RBAC ROLLARI VA FOYDALANUVCHILAR
+  Widget _buildRbacSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Foydalanuvchi va Rolni Tanlash (RBAC)',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Tizim sinovi uchun istalgan akkauntga o\'tishingiz mumkin. Ruxsatlar darhol moslashadi.',
+          style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+        ),
+        const SizedBox(height: 14),
+        ...UserProfile.defaultProfiles.map((p) {
+          final isCurrent = p.id == _profile.id;
+          final isDir = p.role == UserRole.director;
+          final isMgr = p.role == UserRole.salesManager;
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: isCurrent ? const Color(0xFFEEF2FF) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isCurrent ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
+                width: isCurrent ? 1.5 : 1.0,
+              ),
+              boxShadow: isCurrent
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withValues(alpha: 0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: isCurrent ? const Color(0xFF4F46E5) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  isDir ? Icons.shield : (isMgr ? Icons.business_center : Icons.person),
+                  color: isCurrent ? Colors.white : const Color(0xFF64748B),
+                  size: 20,
+                ),
+              ),
+              title: Row(
+                children: [
+                  Text(
+                    p.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isCurrent ? FontWeight.bold : FontWeight.w600,
+                      color: const Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: isDir
+                          ? const Color(0xFFFEF3C7)
+                          : (isCurrent ? Colors.white : const Color(0xFFF1F5F9)),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      p.role.name.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: isDir ? const Color(0xFF92400E) : const Color(0xFF475569),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Wrap(
+                  spacing: 6,
+                  children: [
+                    _buildPermissionTag(
+                      isDir ? 'To\'liq Tasdiq' : (isMgr ? 'Menejer Tasdig\'i' : 'Vazifa Topshirish'),
+                      true,
+                    ),
+                    _buildPermissionTag(
+                      isDir ? 'O\'chirish Huquqi' : 'O\'chirish Cheklangan',
+                      isDir,
+                    ),
+                    _buildPermissionTag(
+                      isDir ? 'Moliya Chiqimi' : 'Faqat KPI',
+                      isDir,
+                    ),
+                  ],
+                ),
+              ),
+              trailing: isCurrent
+                  ? Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF4F46E5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check, size: 14, color: Colors.white),
+                    )
+                  : OutlinedButton(
+                      onPressed: () {
+                        widget.onProfileChanged(p);
+                        setState(() {});
+                      },
+                      style: OutlinedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                        side: const BorderSide(color: Color(0xFFCBD5E1)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                      child: const Text('O\'tish', style: TextStyle(fontSize: 12, color: Color(0xFF475569))),
+                    ),
+              onTap: () {
+                widget.onProfileChanged(p);
+                setState(() {});
+              },
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // 2-BO'LIM: PLAGINLAR MARKAZI (MICROKERNEL STORE)
+  Widget _buildPluginsSection(List<EcosystemPlugin> plugins) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Plaginlar Markazi (Microkernel Engine)',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Barcha funksiyalar yadroga tegmasdan plagin sifatida ulanadi va boshqariladi.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFECFDF5),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFA7F3D0)),
+              ),
+              child: Text(
+                '${plugins.where((p) => p.isEnabled).length} ta faol',
+                style: const TextStyle(color: Color(0xFF065F46), fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+
+        // Har bir plagin uchun SaaS Card
+        ...plugins.map((plugin) {
+          final isConfigurable = plugin.id == 'plugin_uzbek_ai' || plugin.id == 'plugin_ecosystem_bridge';
+          final isAi = plugin.id == 'plugin_uzbek_ai';
+
+          return Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: plugin.isEnabled ? const Color(0xFFE2E8F0) : const Color(0xFFF1F5F9),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Plugin Icon Box
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isAi
+                        ? const Color(0xFFFAF5FF)
+                        : (plugin.isEnabled ? const Color(0xFFEEF2FF) : const Color(0xFFF8FAFC)),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: isAi
+                          ? const Color(0xFFE9D5FF)
+                          : (plugin.isEnabled ? const Color(0xFFC7D2FE) : const Color(0xFFE2E8F0)),
+                    ),
+                  ),
+                  child: Icon(
+                    isAi
+                        ? Icons.auto_awesome
+                        : (plugin.id == 'plugin_ecosystem_bridge' ? Icons.sync_alt : Icons.extension_outlined),
+                    color: isAi
+                        ? const Color(0xFF9333EA)
+                        : (plugin.isEnabled ? const Color(0xFF4F46E5) : const Color(0xFF94A3B8)),
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                // Title, Tags, Description
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            plugin.name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: plugin.isEnabled ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              'v${plugin.version}',
+                              style: const TextStyle(fontSize: 10, color: Color(0xFF64748B), fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFC),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                            ),
+                            child: Text(
+                              plugin.targetApps.join(' • ').toUpperCase(),
+                              style: const TextStyle(fontSize: 9, color: Color(0xFF475569), fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        plugin.description,
+                        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      ),
+                      if (isConfigurable) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Text(
+                              isAi
+                                  ? 'Chegara: ${plugin.metadata['max_bonus_limit'] ?? 2000000} UZS'
+                                  : 'Chiqim chegarasi: ${plugin.metadata['max_payout_limit'] ?? 3000000} UZS',
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF4F46E5), fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 12),
+                            InkWell(
+                              onTap: () => _showPluginConfigDialog(context, plugin),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEEF2FF),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: const Color(0xFFC7D2FE)),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.tune, size: 12, color: Color(0xFF4F46E5)),
+                                    SizedBox(width: 4),
+                                    Text('Sozlash', style: TextStyle(fontSize: 11, color: Color(0xFF4F46E5), fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                // Switch
+                Switch.adaptive(
+                  value: plugin.isEnabled,
+                  activeTrackColor: const Color(0xFF4F46E5),
+                  onChanged: (val) async {
+                    await widget.pluginManager.togglePlugin(plugin.id, val);
+                    setState(() {});
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  // 3-BO'LIM: INFRATUZILMA VA XAVFSIZLIK
+  Widget _buildInfrastructureSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Tizim va Microservice Infratuzilmasi',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Lokal tarmoqdagi HTTP REST API portlari va xotira holati.',
+          style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+        ),
+        const SizedBox(height: 14),
+
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Column(
+            children: [
+              _buildMicroserviceRow('KPI Engine API', ':8081', 'Online (Faol)', 'REST API /schema & /execute', true),
+              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              _buildMicroserviceRow('CRM Gateway', ':8082', 'Ulanishga tayyor', 'Bitimlar va mijozlar oqimi', true),
+              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              _buildMicroserviceRow('Moliya & Kassa Hub', ':8083', 'Ulanishga tayyor', 'Kassa chiqim/kirim balansi', true),
+            ],
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Storage & Audit Log
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.shield_outlined, color: Color(0xFF10B981), size: 18),
+                  SizedBox(width: 8),
+                  Text('Xavfsiz Xotira (StandardStore v1.0)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A))),
+                ],
+              ),
+              SizedBox(height: 6),
+              Text(
+                '• Baza formati: JSON Lines (Fayl darajasidagi xavfsiz blokirovka)\n• Avtomatik zaxira nusxalash (Backup): Har 24 soatda faol\n• Kesh va xotira oqishi: 0 MB (Nol oqish kafolatlangan)',
+                style: TextStyle(fontSize: 12, color: Color(0xFF475569), height: 1.5),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Yordamchi vidjetlar
+  Widget _buildMetaItem(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: const Color(0xFF94A3B8)),
+        const SizedBox(width: 5),
+        Text(text, style: const TextStyle(fontSize: 12, color: Color(0xFF475569), fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
+
+  Widget _buildMetricTile(String title, String val, String sub, Color color, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w600)),
+              Icon(icon, size: 15, color: color),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(val, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color, letterSpacing: -0.5)),
+          const SizedBox(height: 2),
+          Text(sub, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPermissionTag(String text, bool isGranted) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isGranted ? const Color(0xFFF0FDF4) : const Color(0xFFFEF2F2),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: isGranted ? const Color(0xFFBBF7D0) : const Color(0xFFFECACA)),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: isGranted ? const Color(0xFF166534) : const Color(0xFF991B1B),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMicroserviceRow(String name, String port, String status, String note, bool isOnline) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: isOnline ? const Color(0xFF10B981) : Colors.grey,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A))),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(port, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF475569))),
+                    ),
+                  ],
+                ),
+                Text(note, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+              ],
+            ),
+          ),
+          Text(status, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF10B981))),
+        ],
+      ),
+    );
+  }
 }
+
 
 // ============================================================================
 // PLAGIN: O'ZBEKCHA AI EKOTIZIM ASSISTENTI (MODAL BOTTOM SHEET)
